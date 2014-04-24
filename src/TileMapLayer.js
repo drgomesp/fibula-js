@@ -1,5 +1,5 @@
 /*
- * This file is part of the {PACKAGE_NAME} package.
+ * This file is part of the Fibula package.
  *
  * (c) Daniel Ribeiro <drgomesp@gmail.com>
  *
