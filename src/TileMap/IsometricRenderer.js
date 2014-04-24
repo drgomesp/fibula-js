@@ -32,8 +32,6 @@ Fibula.IsometricRenderer.prototype.render = function(tileMap)
     var ctx = this.canvas.getContext('2d'),
         tilesPerRow = tileMap.height / tileMap.tileSize.height,
         tilesPerCol = tileMap.width / tileMap.tileSize.width;
-
-    console.log(this.canvas, tilesPerRow, tilesPerCol);
     
     tileMap.layers.forEach(function(layer) {
         for (var row = 0; row < tilesPerRow; row++) {
