@@ -18,7 +18,7 @@
  * @param {number} width The width of the tile map.
  * @param {number} height The height of the tile map.
  */
-TileMap = function(tileSet, tileSize, width, height)
+TileMap = function(key, tileSet, tileSize, width, height)
 {
     /**
      * The projection of the tile map (isometric, orthogonal)
@@ -26,6 +26,12 @@ TileMap = function(tileSet, tileSize, width, height)
      */
     this.projection = null;
 
+    /**
+     * The string key of the tile map.
+     * @type {string}
+     */
+    this.key = key;
+    
     /**
      * The tile set to load on the tile map.
      * @type {TileSet}
@@ -115,6 +121,15 @@ TileMap.prototype.render = function(canvas)
             }
         }
     }, this);
+};
+
+/**
+ * Loads a json file definition of a tile map.
+ * @param {string} path The path of the json file.
+ */
+TileMap.prototype.loadFromJson = function(path)
+{
+    // @todo call parser
 };
 
 /**
