@@ -10,16 +10,15 @@
 /**
  * Creates a new TileMapLayer object.
  *
- * @class TileMapLayer
+ * @class Fibula.TileMapLayer
  * @constructor
  * @param {string} name The name of the layer.
- * @param {array} data The data array containing the keys for the tile set image.
  */
-TileMapLayer = function(name)
+Fibula.TileMapLayer = function(name)
 {
     /**
      * The data array containing the keys for the tile set image.
-     * @type {array}
+     * @type {Array}
      */
     this.data = [];
 
@@ -42,4 +41,4 @@ TileMapLayer = function(name)
     this.visible = true;
 };
 
-TileMapLayer.prototype.constructor = TileMapLayer;
+Fibula.TileMapLayer.prototype.constructor = Fibula.TileMapLayer;

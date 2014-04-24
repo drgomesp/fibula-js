@@ -10,15 +10,15 @@
 /**
  * Creates a new TileMap object.
  * 
- * @class TileMap
+ * @class Fibula.TileMap
  * @constructor
- * @param {string} projection The projection of the tile map.
- * @param {TileSet} tileSet The tile set to load on the tile map.
- * @param {TileSize} tileSize The tile size dimensions object.
+ * @param {string} key The string key of the tile map.
+ * @param {Fibula.TileSet} tileSet The tile set to load on the tile map.
+ * @param {Fibula.TileSize} tileSize The tile size dimensions object.
  * @param {number} width The width of the tile map.
  * @param {number} height The height of the tile map.
  */
-TileMap = function(key, tileSet, tileSize, width, height)
+Fibula.TileMap = function(key, tileSet, tileSize, width, height)
 {
     /**
      * The projection of the tile map (isometric, orthogonal)
@@ -34,13 +34,13 @@ TileMap = function(key, tileSet, tileSize, width, height)
     
     /**
      * The tile set to load on the tile map.
-     * @type {TileSet}
+     * @type {Fibula.TileSet}
      */
     this.tileSet = tileSet;
 
     /**
      * The tile size dimensions object.
-     * @type {TileSize}
+     * @type {Fibula.TileSize}
      */
     this.tileSize = tileSize;
 
@@ -58,7 +58,7 @@ TileMap = function(key, tileSet, tileSize, width, height)
 
     /**
      * The array of tile map layers.
-     * @type {Array}<TileMapLayer>
+     * @type {Array}<Fibula.TileMapLayer>
      */
     this.layers = [];
 
@@ -73,20 +73,20 @@ TileMap = function(key, tileSet, tileSize, width, height)
  * The orthogonal projection type constant.
  * @type {string}
  */
-TileMap.PROJECTION_ORTHOGONAL = "orthogonal";
+Fibula.TileMap.PROJECTION_ORTHOGONAL = "orthogonal";
 
 /**
  * The isometric projection type constant.
  * @type {string}
  */
-TileMap.PROJECTION_ISOMETRIC = "isometric";
+Fibula.TileMap.PROJECTION_ISOMETRIC = "isometric";
 
 /**
  * Renders the tile map by looping through all layers on a given html canvas element.
  * 
  * @param {HTMLCanvasElement} canvas The canvas element to draw the tile map on.
  */
-TileMap.prototype.render = function(canvas)
+Fibula.TileMap.prototype.render = function(canvas)
 {
     var ctx = canvas.getContext('2d'),
         tilesPerRow = this.height / this.tileSize.height,
@@ -96,8 +96,8 @@ TileMap.prototype.render = function(canvas)
         for (var x = 0; x < tilesPerRow; x++) {
             for (var y = 0; y < tilesPerCol; y++) {
                 var tile = layer.data[x][y],
-                    tileRow = Math.floor(tile / this.tileSet.tilesPerRow),
-                    tileCol = Math.floor(tile % this.tileSet.tilesPerRow),
+                    tileRow = Math.floor(tile / this.tileSet.columns),
+                    tileCol = Math.floor(tile % this.tileSet.columns),
                     posCol = (y * this.tileSize.height),
                     posRow = (x * this.tileSize.width);
 
@@ -127,7 +127,7 @@ TileMap.prototype.render = function(canvas)
  * Loads a json file definition of a tile map.
  * @param {string} path The path of the json file.
  */
-TileMap.prototype.loadFromJson = function(path)
+Fibula.TileMap.prototype.loadFromJson = function(path)
 {
     // @todo call parser
 };
@@ -136,7 +136,7 @@ TileMap.prototype.loadFromJson = function(path)
  * Changes the control flag for showing the grid.
  * @param {boolean} flag Weather to show the grid or not.
  */
-TileMap.prototype.setShowGrid = function(flag)
+Fibula.TileMap.prototype.setShowGrid = function(flag)
 {
     this.showGrid = flag;
 };
@@ -144,11 +144,11 @@ TileMap.prototype.setShowGrid = function(flag)
 /**
  * Adds a tile map layer to the tile map.
  * 
- * @param {TileMapLayer} layer The tile map layer to add.
+ * @param {Fibula.TileMapLayer} layer The tile map layer to add.
  */
-TileMap.prototype.addLayer = function(layer)
+Fibula.TileMap.prototype.addLayer = function(layer)
 {
     this.layers.push(layer);
 };
 
-TileMap.prototype.constructor = TileMap;
+Fibula.TileMap.prototype.constructor = Fibula.TileMap;

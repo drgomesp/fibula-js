@@ -10,12 +10,14 @@
 /**
  * Creates a new TileSet object.
  * 
- * @class TileSet
+ * @class Fibula.TileSet
  * @constructor
  * @param {Image} image The image of the tile set.
- * @param {number} tilesPerRow The amount of tiles per row on the tile set.
+ * @param {number} rows The number of rows on the tile set.
+ * @param {number} columns The number of rows on the tile set.
+ * @param {Fibula.TileSize} tileSize The size of the tile on the tile set.
  */
-TileSet = function(image, tilesPerRow)
+Fibula.TileSet = function(image, rows, columns, tileSize)
 {
     /**
      * The image to be used on the tile set.
@@ -24,10 +26,22 @@ TileSet = function(image, tilesPerRow)
     this.image = image;
 
     /**
-     * The number of tiles per row on the image.
+     * The number of rows on the tile set.
      * @type {number}
      */
-    this.tilesPerRow = tilesPerRow;
+    this.rows = rows;
+
+    /**
+     * The number of rows on the tile set.
+     * @type {number}
+     */
+    this.columns = columns;
+
+    /**
+     * The size of the tile on the tile set. 
+     * @type {Fibula.TileSize}
+     */
+    this.tileSize = tileSize;
 };
 
-TileSet.prototype.constructor = TileSet;
+Fibula.TileSet.prototype.constructor = Fibula.TileSet;

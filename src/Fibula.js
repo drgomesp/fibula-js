@@ -7,15 +7,7 @@
  * file that was distributed with this source code.
  */
 
-/**
- * Creates a new TileMapParser object.
- * 
- * @class Fibula.TileMap
- * @constructor
- */
-Fibula.TileMapParser = function()
+var Fibula = Fibula || 
 {
-
+    
 };
-
-Fibula.TileMapParser.prototype.constructor = Fibula.TileMapParser;

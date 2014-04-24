@@ -10,12 +10,12 @@
 /**
  * Creates a new TileSize object.
  * 
- * @class TileSize
+ * @class Fibula.TileSize
  * @constructor
  * @param {number} width
  * @param {number} height
  */
-TileSize = function(width, height)
+Fibula.TileSize = function(width, height)
 {
     /**
      * The width of the tile size.
@@ -30,4 +30,4 @@ TileSize = function(width, height)
     this.height = height;
 };
 
-TileSize.prototype.constructor = TileSize;
+Fibula.TileSize.prototype.constructor = Fibula.TileSize;
