@@ -62,6 +62,12 @@ Fibula.TileMap = function(key, tileSet, tileSize, width, height, projection)
      * @type {Array}<Fibula.TileMapLayer>
      */
     this.layers = [];
+
+    /**
+     * The renderer strategy to render the tile map.
+     * @type {Fibula.OrthogonalRenderer|Fibula.IsometricRenderer}
+     */
+    this.renderer = null;
 };
 
 /**
@@ -85,76 +91,14 @@ Fibula.TileMap.prototype.render = function(canvas)
 {
     switch(this.projection) {
         case Fibula.TileMap.PROJECTION_ORTHOGONAL:
-            this.renderOrthogonal(canvas);
+            this.renderer = new Fibula.OrthogonalRenderer(canvas);
             break;
         case Fibula.TileMap.PROJECTION_ISOMETRIC:
-            this.renderIsometric(canvas);
+            this.renderer = new Fibula.IsometricRenderer(canvas);
             break;
     }
-};
-
-Fibula.TileMap.prototype.renderOrthogonal = function(canvas)
-{
-    var ctx = canvas.getContext('2d'),
-        tilesPerRow = this.height / this.tileSize.height,
-        tilesPerCol = this.width / this.tileSize.width;
     
-    this.layers.forEach(function(layer) {
-        for (var row = 0; row < tilesPerRow; row++) {
-            for (var column = 0; column < tilesPerCol; column++) {
-                var tile = layer.data[row][column],
-                    tileRow = Math.floor(tile / this.tileSet.columns),
-                    tileCol = Math.floor(tile % this.tileSet.columns),
-                    cartesianX = (column * this.tileSize.height),
-                    cartesianY = (row * this.tileSize.width);
-
-                ctx.drawImage(
-                    this.tileSet.image,
-                    (tileCol * this.tileSize.height),
-                    (tileRow * this.tileSize.width),
-                    this.tileSize.width,
-                    this.tileSize.height,
-                    cartesianX,
-                    cartesianY,
-                    this.tileSize.width,
-                    this.tileSize.height
-                );
-            }
-        }
-    }, this);
-};
-
-Fibula.TileMap.prototype.renderIsometric = function(canvas)
-{
-    var ctx = canvas.getContext('2d'),
-        tilesPerRow = this.height / this.tileSize.height,
-        tilesPerCol = this.width / this.tileSize.width;
-    
-    console.log(this.tileSize.width, this.tileSize.height);
-
-    this.layers.forEach(function(layer) {
-        for (var row = 0; row < tilesPerRow; row++) {
-            for (var column = 0; column < tilesPerCol; column++) {
-                var tile = layer.data[row][column],
-                    tileRow = Math.floor(tile / this.tileSet.columns),
-                    tileCol = Math.floor(tile % this.tileSet.columns),
-                    isometricX = (row - column) * (this.tileSize.width / 2),
-                    isometricY = (row + column) * (this.tileSize.height / 2);
-                
-                ctx.drawImage(
-                    this.tileSet.image,
-                    tileCol * this.tileSet.tileSize.height,
-                    tileRow * this.tileSet.tileSize.width,
-                    this.tileSet.tileSize.width,
-                    this.tileSet.tileSize.height,
-                    isometricX,
-                    isometricY,
-                    this.tileSet.tileSize.width,
-                    this.tileSet.tileSize.height
-                );
-            }
-        }
-    }, this);
+    this.renderer.render(this);
 };
 
 /**
