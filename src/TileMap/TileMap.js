@@ -17,15 +17,10 @@
  * @param {Fibula.TileSize} tileSize The tile size dimensions object.
  * @param {number} width The width of the tile map.
  * @param {number} height The height of the tile map.
+ * @param {string} projection The projection of the tile map.
  */
-Fibula.TileMap = function(key, tileSet, tileSize, width, height)
+Fibula.TileMap = function(key, tileSet, tileSize, width, height, projection)
 {
-    /**
-     * The projection of the tile map (isometric, orthogonal)
-     * @type {string}
-     */
-    this.projection = null;
-
     /**
      * The string key of the tile map.
      * @type {string}
@@ -57,16 +52,16 @@ Fibula.TileMap = function(key, tileSet, tileSize, width, height)
     this.height = height;
 
     /**
+     * The projection of the tile map (isometric, orthogonal)
+     * @type {string}
+     */
+    this.projection = projection;
+
+    /**
      * The array of tile map layers.
      * @type {Array}<Fibula.TileMapLayer>
      */
     this.layers = [];
-
-    /**
-     * Boolean flag for controlling the grid display.
-     * @type {boolean}
-     */
-    this.showGrid = false;
 };
 
 /**
@@ -88,18 +83,30 @@ Fibula.TileMap.PROJECTION_ISOMETRIC = "isometric";
  */
 Fibula.TileMap.prototype.render = function(canvas)
 {
+    switch(this.projection) {
+        case Fibula.TileMap.PROJECTION_ORTHOGONAL:
+            this.renderOrthogonal(canvas);
+            break;
+        case Fibula.TileMap.PROJECTION_ISOMETRIC:
+            this.renderIsometric(canvas);
+            break;
+    }
+};
+
+Fibula.TileMap.prototype.renderOrthogonal = function(canvas)
+{
     var ctx = canvas.getContext('2d'),
         tilesPerRow = this.height / this.tileSize.height,
         tilesPerCol = this.width / this.tileSize.width;
     
     this.layers.forEach(function(layer) {
-        for (var x = 0; x < tilesPerRow; x++) {
-            for (var y = 0; y < tilesPerCol; y++) {
-                var tile = layer.data[x][y],
+        for (var row = 0; row < tilesPerRow; row++) {
+            for (var column = 0; column < tilesPerCol; column++) {
+                var tile = layer.data[row][column],
                     tileRow = Math.floor(tile / this.tileSet.columns),
                     tileCol = Math.floor(tile % this.tileSet.columns),
-                    posCol = (y * this.tileSize.height),
-                    posRow = (x * this.tileSize.width);
+                    cartesianX = (column * this.tileSize.height),
+                    cartesianY = (row * this.tileSize.width);
 
                 ctx.drawImage(
                     this.tileSet.image,
@@ -107,17 +114,44 @@ Fibula.TileMap.prototype.render = function(canvas)
                     (tileRow * this.tileSize.width),
                     this.tileSize.width,
                     this.tileSize.height,
-                    posCol,
-                    posRow,
+                    cartesianX,
+                    cartesianY,
                     this.tileSize.width,
                     this.tileSize.height
                 );
+            }
+        }
+    }, this);
+};
 
-                if (this.showGrid) {
-                    ctx.strokeStyle = "#FF00FF";
-                    ctx.lineWidth = 1;
-                    ctx.strokeRect(posCol, posRow, this.tileSize.width, this.tileSize.height);
-                }
+Fibula.TileMap.prototype.renderIsometric = function(canvas)
+{
+    var ctx = canvas.getContext('2d'),
+        tilesPerRow = this.height / this.tileSize.height,
+        tilesPerCol = this.width / this.tileSize.width;
+    
+    console.log(this.tileSize.width, this.tileSize.height);
+
+    this.layers.forEach(function(layer) {
+        for (var row = 0; row < tilesPerRow; row++) {
+            for (var column = 0; column < tilesPerCol; column++) {
+                var tile = layer.data[row][column],
+                    tileRow = Math.floor(tile / this.tileSet.columns),
+                    tileCol = Math.floor(tile % this.tileSet.columns),
+                    isometricX = (row - column) * (this.tileSize.width / 2),
+                    isometricY = (row + column) * (this.tileSize.height / 2);
+                
+                ctx.drawImage(
+                    this.tileSet.image,
+                    tileCol * this.tileSet.tileSize.height,
+                    tileRow * this.tileSet.tileSize.width,
+                    this.tileSet.tileSize.width,
+                    this.tileSet.tileSize.height,
+                    isometricX,
+                    isometricY,
+                    this.tileSet.tileSize.width,
+                    this.tileSet.tileSize.height
+                );
             }
         }
     }, this);
@@ -130,15 +164,6 @@ Fibula.TileMap.prototype.render = function(canvas)
 Fibula.TileMap.prototype.loadFromJson = function(path)
 {
     // @todo call parser
-};
-
-/**
- * Changes the control flag for showing the grid.
- * @param {boolean} flag Weather to show the grid or not.
- */
-Fibula.TileMap.prototype.setShowGrid = function(flag)
-{
-    this.showGrid = flag;
 };
 
 /**

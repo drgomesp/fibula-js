@@ -10,7 +10,7 @@
 /**
  * Creates a new TileMapParser object.
  * 
- * @class Fibula.TileMap
+ * @class Fibula.TileMapParser
  * @constructor
  */
 Fibula.TileMapParser = function()
