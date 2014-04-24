@@ -42,6 +42,8 @@ Fibula.IsometricRenderer.prototype.render = function(tileMap)
                     isometricX = (row - column) * (tileMap.tileSize.width / 2),
                     isometricY = (row + column) * (tileMap.tileSize.height / 2);
 
+                isometricX += tileMap.width / 2; // Adjust the middle of the "camera"
+                
                 ctx.drawImage(
                     tileMap.tileSet.image,
                     tileCol * tileMap.tileSet.tileSize.height,
