@@ -32,7 +32,7 @@ Fibula.TileSet = function(image, rows, columns, tileSize)
     this.rows = rows;
 
     /**
-     * The number of rows on the tile set.
+     * The number of columns on the tile set.
      * @type {number}
      */
     this.columns = columns;

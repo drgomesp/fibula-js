@@ -30,8 +30,8 @@ Fibula.OrthogonalRenderer = function(canvas)
 Fibula.OrthogonalRenderer.prototype.render = function(tileMap)
 {
     var ctx = this.canvas.getContext('2d'),
-        tilesPerRow = tileMap.height / tileMap.tileSize.height,
-        tilesPerCol = tileMap.width / tileMap.tileSize.width;
+        tilesPerRow = tileMap.height / tileMap.tileSize.width,
+        tilesPerCol = tileMap.width / tileMap.tileSize.height;
 
     tileMap.layers.forEach(function(layer) {
         for (var row = 0; row < tilesPerRow; row++) {
@@ -41,7 +41,7 @@ Fibula.OrthogonalRenderer.prototype.render = function(tileMap)
                     tileCol = Math.floor(tile % tileMap.tileSet.columns),
                     cartesianX = (column * tileMap.tileSize.height),
                     cartesianY = (row * tileMap.tileSize.width);
-
+                
                 ctx.drawImage(
                     tileMap.tileSet.image,
                     (tileCol * tileMap.tileSize.height),
