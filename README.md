@@ -4,6 +4,10 @@ A tile-based HTML5 Canvas & WebGL engine with support for orthogonal and axonome
  
 By [Daniel Ribeiro](http://github.com/drgomesp).
 
+> **Notice:** Fibula is in the early stages of development. We currently don't have 
+> many things implemented yet, but we have an extensive roadmap for a lot of important
+> things that will come up soon enough, such as WebGL rendering, Tiled support and so on.
+
 Getting Started
 -----
 
