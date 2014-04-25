@@ -42,13 +42,13 @@ Fibula.TileSet = function(image, tileWidth, tileHeight, width, height)
      * The width of the tile set.
      * @type {number}
      */
-    this.width = width;
+    this.width = width || image.width / tileWidth;
 
     /**
      * The height of the tile set.
      * @type {number}
      */
-    this.height = height;
+    this.height = height || image.height / tileHeight;
 };
 
 Fibula.TileSet.prototype.constructor = Fibula.TileSet;
