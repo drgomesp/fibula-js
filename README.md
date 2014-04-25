@@ -27,16 +27,17 @@ Suppose you have the following tile set:
 ![orthogonal-tileset](http://i1.wp.com/blog.sklambert.com/wp-content/uploads/2013/07/tileset.png?resize=512%2C512)
 
 To get a simple example working, you first need to create a `TileSet` object. In order to do that,
-you first need an `Image` object that will hold the tile set image and a `TileSize` object, that will
-hold the tile size information for that tile set:
+you first need an `Image` object that will hold the tile set image:
 
 ```javascript
 var bg = new Image();
 bg.src = "http://i1.wp.com/blog.sklambert.com/wp-content/uploads/2013/07/tileset.png";
 
-var tileSizeOfTileSet = new Fibula.TileSize(32, 32);
-var tileSet = new Fibula.TileSet(bg, 16, 16, tileSizeOfTileSet);
+var tileSet = new Fibula.TileSet(bg, 32, 32, 512, 512);
 ```
+
+Here, we've passed the background image, the tile width, the tile height, the 
+tile set width and the tile set height.
 
 After having created a `TileSet` object, we need two more steps: 1) create the layers
 that will hold the background data information; 2) create the actual tile map and render
@@ -83,13 +84,8 @@ following image:
 So the next step is to actually create the tile set and render it to the canvas
 object we're working on. That's very straightforward, and we use the `TileMap` object:
 
-> One important notice here is the usage of the `TileSize` object again. This will
-> represent the *size of tile on the tile map*, which is **not** the same as the one we used
-> before, which represented the *size of the tile on the tile set*. 
-
 ```javascript
-var tileSizeOfTileMap = new TileSize(32, 32);
-var tileMap = new Fibula.TileMap("my-map-name", tileSet, tileSizeOfTileMap, 640, 480, Fibula.TileMap.PROJECTION_ORTHOGONAL);
+var tileMap = new Fibula.TileMap("my-map-name", tileSizeOfTileMap, 640, 480, Fibula.TileMap.PROJECTION_ORTHOGONAL);
 tileMap.addLayer(layer1);
 ```
 
@@ -173,12 +169,11 @@ The first thing we need to do is create the `TileSet` object, as we did on the p
 var tileSetImage = new Image();
 tileSetImage.src = "http://s27.postimg.org/6c9sa3s0j/isometric_grass_and_water.png";
     
-var tileSizeOfTileSet = new Fibula.TileSize(64, 64);
-var tileSet = new Fibula.TileSet(tileSetImage, 6, 4, tileSizeOfTileSet);
+var tileSet = new Fibula.TileSet(tileSetImage, 64, 64, 256, 384);
 ```
 
 In this example, the tile set has tiles of 64x64 dimensions, and the tile set image
-has 6 lines by 4 rows.
+is 256x384.
 
 The next step is to create the first layer (and we're going to create a much smaller
 map in order for the example to be cleaner):
@@ -197,8 +192,7 @@ layer1.data = [
 Now let's create and render our tile map:
 
 ```javascript
-var tileSizeOfTileMap = new Fibula.TileSize(64, 32);
-var tileMap = new Fibula.TileMap("isometric-map", tileSet, tileSizeOfTileMap, 320, 160, Fibula.TileMap.PROJECTION_ISOMETRIC);
+var tileMap = new Fibula.TileMap("isometric-map", tileSizeOfTileMap, 320, 160, Fibula.TileMap.PROJECTION_ISOMETRIC);
 tileMap.addLayer(layer1);
 
 var canvas = document.getElementById("main");
