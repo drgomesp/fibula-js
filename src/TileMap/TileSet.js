@@ -12,36 +12,43 @@
  * 
  * @class Fibula.TileSet
  * @constructor
- * @param {Image} image The image of the tile set.
- * @param {number} rows The number of rows on the tile set.
- * @param {number} columns The number of rows on the tile set.
- * @param {Fibula.TileSize} tileSize The size of the tile on the tile set.
+ * @param {HTMLImageElement} image The image of the tile set.
+ * @param {number} tileWidth The width of the tile.
+ * @param {number} tileHeight The height of the tile.
+ * @param {number} width The width of the tile set.
+ * @param {number} height The height of the tile set.
  */
-Fibula.TileSet = function(image, rows, columns, tileSize)
+Fibula.TileSet = function(image, tileWidth, tileHeight, width, height)
 {
     /**
      * The image to be used on the tile set.
-     * @type {Image}
+     * @type {HTMLImageElement}
      */
     this.image = image;
 
     /**
-     * The number of rows on the tile set.
+     * The width of the tile. 
      * @type {number}
      */
-    this.rows = rows;
+    this.tileWidth = tileWidth;
 
     /**
-     * The number of columns on the tile set.
+     * The height of the tile.
      * @type {number}
      */
-    this.columns = columns;
+    this.tileHeight = tileHeight;
 
     /**
-     * The size of the tile on the tile set. 
-     * @type {Fibula.TileSize}
+     * The width of the tile set.
+     * @type {number}
      */
-    this.tileSize = tileSize;
+    this.width = width;
+
+    /**
+     * The height of the tile set.
+     * @type {number}
+     */
+    this.height = height;
 };
 
 Fibula.TileSet.prototype.constructor = Fibula.TileSet;

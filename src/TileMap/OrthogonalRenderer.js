@@ -30,28 +30,29 @@ Fibula.OrthogonalRenderer = function(canvas)
 Fibula.OrthogonalRenderer.prototype.render = function(tileMap)
 {
     var ctx = this.canvas.getContext('2d'),
-        tilesPerRow = tileMap.height / tileMap.tileSize.width,
-        tilesPerCol = tileMap.width / tileMap.tileSize.height;
+        tilesPerRow = tileMap.height / tileMap.tileSet.tileWidth,
+        tilesPerCol = tileMap.width / tileMap.tileSet.tileHeight,
+        tileSetColumns = tileMap.tileSet.width / tileMap.tileSet.tileWidth;
 
     tileMap.layers.forEach(function(layer) {
         for (var row = 0; row < tilesPerRow; row++) {
             for (var column = 0; column < tilesPerCol; column++) {
                 var tile = layer.data[row][column],
-                    tileRow = Math.floor(tile / tileMap.tileSet.columns),
-                    tileCol = Math.floor(tile % tileMap.tileSet.columns),
-                    cartesianX = (column * tileMap.tileSize.height),
-                    cartesianY = (row * tileMap.tileSize.width);
+                    tileRow = Math.floor(tile / tileSetColumns),
+                    tileCol = Math.floor(tile % tileSetColumns),
+                    cartesianX = (column * tileMap.tileSet.tileHeight),
+                    cartesianY = (row * tileMap.tileSet.tileWidth);
                 
                 ctx.drawImage(
                     tileMap.tileSet.image,
-                    (tileCol * tileMap.tileSize.height),
-                    (tileRow * tileMap.tileSize.width),
-                    tileMap.tileSize.width,
-                    tileMap.tileSize.height,
+                    (tileCol * tileMap.tileSet.tileHeight),
+                    (tileRow * tileMap.tileSet.tileWidth),
+                    tileMap.tileSet.tileWidth,
+                    tileMap.tileSet.tileHeight,
                     cartesianX,
                     cartesianY,
-                    tileMap.tileSize.width,
-                    tileMap.tileSize.height
+                    tileMap.tileSet.tileWidth,
+                    tileMap.tileSet.tileHeight
                 );
             }
         }

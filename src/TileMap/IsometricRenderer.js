@@ -30,30 +30,32 @@ Fibula.IsometricRenderer = function(canvas)
 Fibula.IsometricRenderer.prototype.render = function(tileMap)
 {
     var ctx = this.canvas.getContext('2d'),
-        tilesPerRow = tileMap.height / tileMap.tileSize.height,
-        tilesPerCol = tileMap.width / tileMap.tileSize.width;
+        tileHeightOnTileMap = (tileMap.tileSet.tileHeight / 2),// divide the height by 2 because it's isometric 
+        tilesPerRow = tileMap.height / tileHeightOnTileMap,
+        tilesPerCol = tileMap.width / tileMap.tileSet.tileWidth,
+        tileSetColumns = tileMap.tileSet.width / tileMap.tileSet.tileWidth;
     
     tileMap.layers.forEach(function(layer) {
         for (var row = 0; row < tilesPerRow; row++) {
             for (var column = 0; column < tilesPerCol; column++) {
                 var tile = layer.data[row][column],
-                    tileRow = Math.floor(tile / tileMap.tileSet.columns),
-                    tileCol = Math.floor(tile % tileMap.tileSet.columns),
-                    isometricX = (row - column) * (tileMap.tileSize.width / 2),
-                    isometricY = (row + column) * (tileMap.tileSize.height / 2);
+                    tileRow = Math.floor(tile / tileSetColumns),
+                    tileCol = Math.floor(tile % tileSetColumns),
+                    isometricX = (row - column) * (tileMap.tileSet.tileWidth / 2),
+                    isometricY = (row + column) * (tileHeightOnTileMap / 2);
 
                 isometricX += tileMap.width / 2; // Adjust the middle of the "camera"
                 
                 ctx.drawImage(
                     tileMap.tileSet.image,
-                    tileCol * tileMap.tileSet.tileSize.height,
-                    tileRow * tileMap.tileSet.tileSize.width,
-                    tileMap.tileSet.tileSize.width,
-                    tileMap.tileSet.tileSize.height,
+                    tileCol * tileMap.tileSet.tileHeight,
+                    tileRow * tileMap.tileSet.tileWidth,
+                    tileMap.tileSet.tileWidth,
+                    tileMap.tileSet.tileHeight,
                     isometricX,
                     isometricY,
-                    tileMap.tileSet.tileSize.width,
-                    tileMap.tileSet.tileSize.height
+                    tileMap.tileSet.tileWidth,
+                    tileMap.tileSet.tileHeight
                 );
             }
         }

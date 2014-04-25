@@ -14,12 +14,11 @@
  * @constructor
  * @param {string} key The string key of the tile map.
  * @param {Fibula.TileSet} tileSet The tile set to load on the tile map.
- * @param {Fibula.TileSize} tileSize The tile size dimensions object.
  * @param {number} width The width of the tile map.
  * @param {number} height The height of the tile map.
  * @param {string} projection The projection of the tile map.
  */
-Fibula.TileMap = function(key, tileSet, tileSize, width, height, projection)
+Fibula.TileMap = function(key, tileSet, width, height, projection)
 {
     /**
      * The string key of the tile map.
@@ -32,12 +31,6 @@ Fibula.TileMap = function(key, tileSet, tileSize, width, height, projection)
      * @type {Fibula.TileSet}
      */
     this.tileSet = tileSet;
-
-    /**
-     * The tile size dimensions object.
-     * @type {Fibula.TileSize}
-     */
-    this.tileSize = tileSize;
 
     /**
      * The width of the tile map.
