@@ -159,3 +159,87 @@ Amazing, right?!
 
 With the layering system, you can work with collision detection by having the ability
 to decide which layer will the player collide against and which the player will not. 
+
+#### Isometric tile map
+
+If you want to create an isometric tile map, the code for it is almost the same as
+for the orthogonal. Suppose you have the following isometric tile set:
+
+![isometric-tileset](http://s27.postimg.org/6c9sa3s0j/isometric_grass_and_water.png)
+
+The first thing we need to do is create the `TileSet` object, as we did on the previous example:
+
+```javascript
+var tileSetImage = new Image();
+tileSetImage.src = "http://s27.postimg.org/6c9sa3s0j/isometric_grass_and_water.png";
+    
+var tileSizeOfTileSet = new Fibula.TileSize(64, 64);
+var tileSet = new Fibula.TileSet(tileSetImage, 6, 4, tileSizeOfTileSet);
+```
+
+In this example, the tile set has tiles of 64x64 dimensions, and the tile set image
+has 6 lines by 4 rows.
+
+The next step is to create the first layer (and we're going to create a much smaller
+map in order for the example to be cleaner):
+
+```javascript
+var layer1 = new Fibula.TileMapLayer("Tile Layer 1");
+layer1.data = [
+    [3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 0]
+];
+```
+
+Now let's create and render our tile map:
+
+```javascript
+var tileSizeOfTileMap = new Fibula.TileSize(64, 32);
+var tileMap = new Fibula.TileMap("isometric-map", tileSet, tileSizeOfTileMap, 320, 160, Fibula.TileMap.PROJECTION_ISOMETRIC);
+tileMap.addLayer(layer1);
+
+var canvas = document.getElementById("main");
+
+tileSetImage.onload = function() {
+    tileMap.render(canvas);
+};
+```
+
+> Notice here the usage of a 64x32 tile size for the map, which differs from the size
+> of the tiles on the tile set in this case.
+
+The result would be something like this:
+
+![isometric-tilemap-ground](http://s27.postimg.org/nqlsh6kr7/Captura_de_Tela_2014_04_25_s_15_31_15.png)
+
+Now, let's add a new layer and make this map a little bit more interesting:
+
+```javascript
+var layer0 = new Fibula.TileMapLayer("Tile Layer 2");
+layer0.data = [
+    [],
+    [],
+    [],
+    [4, 19, 19, 19, 19],
+    [16, 23, 23, 23, 23]
+];
+```
+
+The last step is to add the layer to the map and render it again:
+
+```javascript
+tileMap.addLayer(layer2);
+    
+tileSetImage.onload = function() {
+    tileMap.render(canvas);
+};
+```
+
+The result should look something like this:
+
+![isometric-tilemap-two-layers](http://s14.postimg.org/po0e3sic1/Captura_de_Tela_2014_04_25_s_15_34_12.png)
+
+Amazing, right!?
