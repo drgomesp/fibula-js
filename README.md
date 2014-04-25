@@ -8,6 +8,11 @@ By [Daniel Ribeiro](http://github.com/drgomesp).
 > many things implemented yet, but we have an extensive roadmap for a lot of important
 > things that will come up soon enough, such as WebGL rendering, Tiled support and so on.
 
+Dependencies
+-----
+
+- [PxLoader](https://github.com/thinkpixellab/PxLoader) – Preloader and resource downloader
+
 Getting Started
 -----
 
@@ -27,17 +32,23 @@ Suppose you have the following tile set:
 ![orthogonal-tileset](http://i1.wp.com/blog.sklambert.com/wp-content/uploads/2013/07/tileset.png?resize=512%2C512)
 
 To get a simple example working, you first need to create a `TileSet` object. In order to do that,
-you first need an `Image` object that will hold the tile set image:
+you first need to load an image using [PxLoader](https://github.com/thinkpixellab/PxLoader):
 
 ```javascript
-var bg = new Image();
-bg.src = "http://i1.wp.com/blog.sklambert.com/wp-content/uploads/2013/07/tileset.png";
-
-var tileSet = new Fibula.TileSet(bg, 32, 32, 512, 512);
+var loader = new PxLoader(),
+        tileSetImage = loader.addImage("http://i1.wp.com/blog.sklambert.com/wp-content/uploads/2013/07/tileset.png");
 ```
 
-Here, we've passed the background image, the tile width, the tile height, the 
-tile set width and the tile set height.
+Now, we'll place our code inside of the callback function of the PxLoader library,
+which will run as soon as the image is loaded and ready:
+
+```javascript
+loader.addCompletionListener(function() {
+    var tileSet = new Fibula.TileSet(tileSetImage, 32, 32);
+});
+```
+
+Here, we've passed the background image, the tile width and the tile height.
 
 After having created a `TileSet` object, we need two more steps: 1) create the layers
 that will hold the background data information; 2) create the actual tile map and render
@@ -45,30 +56,37 @@ it to the canvas object.
 
 So let's create the layers by using the `TileMapLayer` object:
 
+> *Notice:* All code from here will be place inside the addCompletionListener callback
+function.
+
 ```javascript
-var layer1 = new Fibula.TileMapLayer("Tile Layer 1");
-layer1.data = [
-    [172, 172, 172, 79, 34, 34, 34, 34, 34, 34, 34, 34, 56, 57, 54, 55, 56, 147, 67, 67, 68, 79, 79, 171, 172, 172, 173, 79, 79, 55, 55, 55],
-    [172, 172, 172, 79, 34, 34, 34, 34, 34, 34, 146, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172, 159, 189, 79, 79, 55, 55, 55],
-    [172, 172, 172, 79, 79, 34, 34, 34, 34, 34, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 159, 189, 79, 79, 79, 55, 55, 55],
-    [188, 188, 188, 79, 79, 79, 79, 34, 34, 34, 36, 172, 172, 143, 142, 157, 79, 79, 79, 79, 79, 79, 187, 159, 189, 79, 79, 79, 55, 55, 55, 55],
-    [79, 79, 79, 79, 79, 79, 79, 79, 34, 34, 36, 172, 159, 158, 172, 143, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 39, 51, 51, 51, 55, 55],
-    [79, 79, 79, 79, 79, 79, 79, 79, 79, 34, 36, 172, 143, 142, 172, 172, 143, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 55],
-    [79, 79, 79, 79, 79, 79, 79, 79, 79, 34, 52, 172, 172, 172, 172, 172, 172, 143, 156, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79],
-    [79, 79, 79, 79, 79, 79, 79, 79, 79, 34, 52, 172, 172, 172, 172, 172, 172, 159, 188, 189, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79],
-    [79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 188, 158, 172, 172, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 187, 158, 159, 189, 79, 79, 79],
-    [79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 159, 188, 189, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
-    [79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
-    [155, 142, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 187, 188, 188, 189, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
-    [171, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
-    [171, 172, 143, 156, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 187, 189, 79, 79, 79, 79],
-    [187, 188, 158, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79],
-    [79, 79, 79, 188, 189, 79, 79, 79, 79, 79, 79, 155, 156, 156, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 156],
-    [34, 34, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172],
-    [34, 34, 34, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172],
-    [34, 34, 34, 34, 79, 79, 79, 79, 79, 79, 155, 172, 172, 159, 189, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172],
-    [34, 34, 34, 34, 34, 34, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172, 172]
-];
+loader.addCompletionListener(function() {
+    var tileSet = new Fibula.TileSet(tileSetImage, 32, 32);
+
+    var layer1 = new Fibula.TileMapLayer("Tile Layer 1");
+    layer1.data = [
+        [172, 172, 172, 79, 34, 34, 34, 34, 34, 34, 34, 34, 56, 57, 54, 55, 56, 147, 67, 67, 68, 79, 79, 171, 172, 172, 173, 79, 79, 55, 55, 55],
+        [172, 172, 172, 79, 34, 34, 34, 34, 34, 34, 146, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172, 159, 189, 79, 79, 55, 55, 55],
+        [172, 172, 172, 79, 79, 34, 34, 34, 34, 34, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 159, 189, 79, 79, 79, 55, 55, 55],
+        [188, 188, 188, 79, 79, 79, 79, 34, 34, 34, 36, 172, 172, 143, 142, 157, 79, 79, 79, 79, 79, 79, 187, 159, 189, 79, 79, 79, 55, 55, 55, 55],
+        [79, 79, 79, 79, 79, 79, 79, 79, 34, 34, 36, 172, 159, 158, 172, 143, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 39, 51, 51, 51, 55, 55],
+        [79, 79, 79, 79, 79, 79, 79, 79, 79, 34, 36, 172, 143, 142, 172, 172, 143, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 55],
+        [79, 79, 79, 79, 79, 79, 79, 79, 79, 34, 52, 172, 172, 172, 172, 172, 172, 143, 156, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79],
+        [79, 79, 79, 79, 79, 79, 79, 79, 79, 34, 52, 172, 172, 172, 172, 172, 172, 159, 188, 189, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79],
+        [79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 188, 158, 172, 172, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 187, 158, 159, 189, 79, 79, 79],
+        [79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 159, 188, 189, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
+        [79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
+        [155, 142, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 187, 188, 188, 189, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
+        [171, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
+        [171, 172, 143, 156, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 187, 189, 79, 79, 79, 79],
+        [187, 188, 158, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79],
+        [79, 79, 79, 188, 189, 79, 79, 79, 79, 79, 79, 155, 156, 156, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 156],
+        [34, 34, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172],
+        [34, 34, 34, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172],
+        [34, 34, 34, 34, 79, 79, 79, 79, 79, 79, 155, 172, 172, 159, 189, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172],
+        [34, 34, 34, 34, 34, 34, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172, 172]
+    ];
+});
 ```
 
 Here we are doing some basic 2D mapping. The `data` property is a 2D simple array that
@@ -85,8 +103,36 @@ So the next step is to actually create the tile set and render it to the canvas
 object we're working on. That's very straightforward, and we use the `TileMap` object:
 
 ```javascript
-var tileMap = new Fibula.TileMap("my-map-name", tileSizeOfTileMap, 640, 480, Fibula.TileMap.PROJECTION_ORTHOGONAL);
-tileMap.addLayer(layer1);
+loader.addCompletionListener(function() {
+    var tileSet = new Fibula.TileSet(tileSetImage, 32, 32);
+
+    var layer1 = new Fibula.TileMapLayer("Tile Layer 1");
+    layer1.data = [
+        [172, 172, 172, 79, 34, 34, 34, 34, 34, 34, 34, 34, 56, 57, 54, 55, 56, 147, 67, 67, 68, 79, 79, 171, 172, 172, 173, 79, 79, 55, 55, 55],
+        [172, 172, 172, 79, 34, 34, 34, 34, 34, 34, 146, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172, 159, 189, 79, 79, 55, 55, 55],
+        [172, 172, 172, 79, 79, 34, 34, 34, 34, 34, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 159, 189, 79, 79, 79, 55, 55, 55],
+        [188, 188, 188, 79, 79, 79, 79, 34, 34, 34, 36, 172, 172, 143, 142, 157, 79, 79, 79, 79, 79, 79, 187, 159, 189, 79, 79, 79, 55, 55, 55, 55],
+        [79, 79, 79, 79, 79, 79, 79, 79, 34, 34, 36, 172, 159, 158, 172, 143, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 39, 51, 51, 51, 55, 55],
+        [79, 79, 79, 79, 79, 79, 79, 79, 79, 34, 36, 172, 143, 142, 172, 172, 143, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 55],
+        [79, 79, 79, 79, 79, 79, 79, 79, 79, 34, 52, 172, 172, 172, 172, 172, 172, 143, 156, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79],
+        [79, 79, 79, 79, 79, 79, 79, 79, 79, 34, 52, 172, 172, 172, 172, 172, 172, 159, 188, 189, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79],
+        [79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 188, 158, 172, 172, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 187, 158, 159, 189, 79, 79, 79],
+        [79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 159, 188, 189, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
+        [79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
+        [155, 142, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 187, 188, 188, 189, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
+        [171, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
+        [171, 172, 143, 156, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 187, 189, 79, 79, 79, 79],
+        [187, 188, 158, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79],
+        [79, 79, 79, 188, 189, 79, 79, 79, 79, 79, 79, 155, 156, 156, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 156],
+        [34, 34, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172],
+        [34, 34, 34, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172],
+        [34, 34, 34, 34, 79, 79, 79, 79, 79, 79, 155, 172, 172, 159, 189, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172],
+        [34, 34, 34, 34, 34, 34, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172, 172]
+    ];
+    
+    var tileMap = new Fibula.TileMap("my-map-name", tileSizeOfTileMap, 640, 480, Fibula.TileMap.PROJECTION_ORTHOGONAL);
+    tileMap.addLayer(layer1);
+});
 ```
 
 Notice the usage of the `TileMap.addLayer()` method, which pushes the layer to the
@@ -95,11 +141,46 @@ stack of layers of the tile map. This is one the most important parts to underst
 Now we just need to get the canvas object and render the tile map:
 
 ```javascript
-var canvas = document.getElementById("main");
+loader.addCompletionListener(function() {
+    var tileSet = new Fibula.TileSet(tileSetImage, 32, 32);
+
+    var layer1 = new Fibula.TileMapLayer("Tile Layer 1");
+    layer1.data = [
+        [172, 172, 172, 79, 34, 34, 34, 34, 34, 34, 34, 34, 56, 57, 54, 55, 56, 147, 67, 67, 68, 79, 79, 171, 172, 172, 173, 79, 79, 55, 55, 55],
+        [172, 172, 172, 79, 34, 34, 34, 34, 34, 34, 146, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172, 159, 189, 79, 79, 55, 55, 55],
+        [172, 172, 172, 79, 79, 34, 34, 34, 34, 34, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 159, 189, 79, 79, 79, 55, 55, 55],
+        [188, 188, 188, 79, 79, 79, 79, 34, 34, 34, 36, 172, 172, 143, 142, 157, 79, 79, 79, 79, 79, 79, 187, 159, 189, 79, 79, 79, 55, 55, 55, 55],
+        [79, 79, 79, 79, 79, 79, 79, 79, 34, 34, 36, 172, 159, 158, 172, 143, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 39, 51, 51, 51, 55, 55],
+        [79, 79, 79, 79, 79, 79, 79, 79, 79, 34, 36, 172, 143, 142, 172, 172, 143, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 55],
+        [79, 79, 79, 79, 79, 79, 79, 79, 79, 34, 52, 172, 172, 172, 172, 172, 172, 143, 156, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79],
+        [79, 79, 79, 79, 79, 79, 79, 79, 79, 34, 52, 172, 172, 172, 172, 172, 172, 159, 188, 189, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79],
+        [79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 188, 158, 172, 172, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 187, 158, 159, 189, 79, 79, 79],
+        [79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 159, 188, 189, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
+        [79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
+        [155, 142, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 187, 188, 188, 189, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
+        [171, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
+        [171, 172, 143, 156, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 187, 189, 79, 79, 79, 79],
+        [187, 188, 158, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79],
+        [79, 79, 79, 188, 189, 79, 79, 79, 79, 79, 79, 155, 156, 156, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 156],
+        [34, 34, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172],
+        [34, 34, 34, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172],
+        [34, 34, 34, 34, 79, 79, 79, 79, 79, 79, 155, 172, 172, 159, 189, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172],
+        [34, 34, 34, 34, 34, 34, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172, 172]
+    ];
     
-tileSetImage.onload = function() {
+    var tileMap = new Fibula.TileMap("my-map-name", tileSizeOfTileMap, 640, 480, Fibula.TileMap.PROJECTION_ORTHOGONAL);
+    tileMap.addLayer(layer1);
+    
+    var canvas = document.getElementById("main");
     tileMap.render(canvas);
-};
+});
+```
+
+Now, outside of the PxLoader callback function, we'll start to load the images and
+the callback function will be triggered as soon as everything is ready:
+
+```javascript
+loader.start();
 ```
 
 We should get a result like this:
@@ -141,10 +222,6 @@ rendering the tile map again:
 
 ```javascript
 tileMap.addLayer(layer2);
-
-tileSetImage.onload = function() {
-    tileMap.render(canvas);
-};
 ```
 
 The result is should look like this:
@@ -166,46 +243,67 @@ for the orthogonal. Suppose you have the following isometric tile set:
 The first thing we need to do is create the `TileSet` object, as we did on the previous example:
 
 ```javascript
-var tileSetImage = new Image();
-tileSetImage.src = "http://s27.postimg.org/6c9sa3s0j/isometric_grass_and_water.png";
-    
-var tileSet = new Fibula.TileSet(tileSetImage, 64, 64, 256, 384);
+var loader = new PxLoader(),
+        tileSetImage = loader.addImage("http://s27.postimg.org/6c9sa3s0j/isometric_grass_and_water.png");
+   
+loader.addCompletionListener(function() {
+    var tileSet = new Fibula.TileSet(tileSetImage, 64, 64);
+});
 ```
 
-In this example, the tile set has tiles of 64x64 dimensions, and the tile set image
-is 256x384.
+In this example, the tile set has tiles of 64x64 dimensions.
 
 The next step is to create the first layer (and we're going to create a much smaller
 map in order for the example to be cleaner):
 
 ```javascript
-var layer1 = new Fibula.TileMapLayer("Tile Layer 1");
-layer1.data = [
-    [3, 3, 3, 3, 3],
-    [3, 3, 3, 3, 3],
-    [3, 3, 3, 3, 3],
-    [3, 3, 3, 3, 3],
-    [3, 3, 3, 3, 0]
-];
+loader.addCompletionListener(function() {
+    var tileSet = new Fibula.TileSet(tileSetImage, 64, 64);
+    
+    var layer1 = new Fibula.TileMapLayer("Tile Layer 1");
+    layer1.data = [
+        [3, 3, 3, 3, 3],
+        [3, 3, 3, 3, 3],
+        [3, 3, 3, 3, 3],
+        [3, 3, 3, 3, 3],
+        [3, 3, 3, 3, 0]
+    ];
+});
 ```
 
 Now let's create and render our tile map:
 
 ```javascript
-var tileMap = new Fibula.TileMap("isometric-map", tileSizeOfTileMap, 320, 160, Fibula.TileMap.PROJECTION_ISOMETRIC);
-tileMap.addLayer(layer1);
-
-var canvas = document.getElementById("main");
-
-tileSetImage.onload = function() {
+loader.addCompletionListener(function() {
+    var tileSet = new Fibula.TileSet(tileSetImage, 64, 64);
+    
+    var layer1 = new Fibula.TileMapLayer("Tile Layer 1");
+    layer1.data = [
+        [3, 3, 3, 3, 3],
+        [3, 3, 3, 3, 3],
+        [3, 3, 3, 3, 3],
+        [3, 3, 3, 3, 3],
+        [3, 3, 3, 3, 0]
+    ];
+    
+    var tileMap = new Fibula.TileMap("isometric-map", tileSizeOfTileMap, 320, 160, Fibula.TileMap.PROJECTION_ISOMETRIC);
+    tileMap.addLayer(layer1);
+    
+    var canvas = document.getElementById("main");
     tileMap.render(canvas);
-};
+});
 ```
 
 > Notice here the usage of a 64x32 tile size for the map, which differs from the size
 > of the tiles on the tile set in this case.
 
-The result would be something like this:
+Now, you start the PxLoader loader:
+
+```javascript
+loader.start();
+```
+
+The result should look like this:
 
 ![isometric-tilemap-ground](http://s27.postimg.org/nqlsh6kr7/Captura_de_Tela_2014_04_25_s_15_31_15.png)
 
@@ -226,10 +324,6 @@ The last step is to add the layer to the map and render it again:
 
 ```javascript
 tileMap.addLayer(layer2);
-    
-tileSetImage.onload = function() {
-    tileMap.render(canvas);
-};
 ```
 
 The result should look something like this:
