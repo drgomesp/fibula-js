@@ -15,10 +15,8 @@
  * @param {HTMLImageElement} image The image of the tile set.
  * @param {number} tileWidth The width of the tile.
  * @param {number} tileHeight The height of the tile.
- * @param {number} width The width of the tile set.
- * @param {number} height The height of the tile set.
  */
-Fibula.TileSet = function(image, tileWidth, tileHeight, width, height)
+Fibula.TileSet = function(image, tileWidth, tileHeight)
 {
     /**
      * The image to be used on the tile set.
@@ -42,13 +40,13 @@ Fibula.TileSet = function(image, tileWidth, tileHeight, width, height)
      * The width of the tile set.
      * @type {number}
      */
-    this.width = width;
+    this.width = image.width;
 
     /**
      * The height of the tile set.
      * @type {number}
      */
-    this.height = height;
+    this.height = image.height;
 };
 
 Fibula.TileSet.prototype.constructor = Fibula.TileSet;
