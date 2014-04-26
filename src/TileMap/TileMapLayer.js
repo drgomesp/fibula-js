@@ -22,11 +22,12 @@ Fibula.TileMapLayer = function(name, tileMap)
      * @type {string}
      */
     this.name = name;
+    
     /**
-     * The tile map where this layer belongs to.
+     * The tile map where this layer belongs to – returned after adding this layer to the map.
      * @type {Fibula.TileMap}
      */
-    this.tileMap = tileMap;
+    this.tileMap = tileMap ? tileMap.addLayer(this) : null;
 
     /**
      * The data array containing the keys for the tile set image.

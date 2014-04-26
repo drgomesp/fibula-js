@@ -104,13 +104,14 @@ Fibula.TileMap.prototype.loadFromJson = function(path)
 };
 
 /**
- * Adds a tile map layer to the tile map.
+ * Adds a tile map layer to the tile map and returns the tile map.
  * 
  * @param {Fibula.TileMapLayer} layer The tile map layer to add.
  */
 Fibula.TileMap.prototype.addLayer = function(layer)
 {
     this.layers.push(layer);
+    return this;
 };
 
 Fibula.TileMap.prototype.constructor = Fibula.TileMap;
