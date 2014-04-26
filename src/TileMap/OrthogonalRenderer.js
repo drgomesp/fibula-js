@@ -12,54 +12,71 @@
  *
  * @class Fibula.OrthogonalRenderer
  * @constructor
- * @param {HTMLCanvasElement} canvas The canvas to render on.
+ * @param {Object} settings The settings object
  */
-Fibula.OrthogonalRenderer = function(canvas)
+Fibula.OrthogonalRenderer = function(settings)
 {
     /**
-     * The canvas to render on.
+     * The settings object.
+     * @type {Object}
+     */
+    settings = settings || this.settings;
+
+    /**
+     * The HTML canvas object.
      * @type {HTMLCanvasElement}
      */
-    this.canvas = canvas;
+    this.canvas = settings.canvas || this.canvas;
+
+    /**
+     * The tile map object.
+     * @type {Fibula.TileMap}
+     */
+    this.tileMap = settings.tileMap || this.tileMap;
+
+    /**
+     * The view area object.
+     * @type {Object}
+     */
+    this.viewArea = {
+        x: this.viewArea.x,
+        y: this.viewArea.y,
+        width: this.viewArea.width,
+        height: this.viewArea.height
+    };
+};
+
+Fibula.OrthogonalRenderer.prototype = {
+    
+    canvas: null,
+    
+    tileMap: null,
+
+    viewArea: {
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100
+    }
 };
 
 /**
  * Renders the tile map to the canvas.
- * @param {Fibula.TileMap} tileMap The tile map to render against the canvas.
+ * @param {Object} viewArea The object that defines the view area to render.
  */
-Fibula.OrthogonalRenderer.prototype.render = function(tileMap)
+Fibula.OrthogonalRenderer.prototype.render = function(viewArea)
 {
-    var ctx = this.canvas.getContext('2d'),
-        tilesPerRow = tileMap.height / tileMap.tileSet.tileWidth,
-        tilesPerCol = tileMap.width / tileMap.tileSet.tileHeight,
-        tileSetColumns = tileMap.tileSet.width / tileMap.tileSet.tileWidth;
+    var ctx = this.canvas.getContext("2d"),
+        viewX = viewArea.x || this.viewArea.x,
+        viewY = viewArea.y || this.viewArea.y,
+        viewWidth = viewArea.width || this.viewArea.width,
+        viewHeight = viewArea.height || this.viewArea.height;
 
-    tileMap.layers.forEach(function(layer) {
-        for (var row = 0; row < tilesPerRow; row++) {
-            for (var column = 0; column < tilesPerCol; column++) {
-                var tileSetPosition = layer.data[row][column],
-                    tileRow = Math.floor(tileSetPosition / tileSetColumns),
-                    tileCol = Math.floor(tileSetPosition % tileSetColumns),
-                    cartesianX = (column * tileMap.tileSet.tileHeight),
-                    cartesianY = (row * tileMap.tileSet.tileWidth),
-                    tile = new Fibula.Tile(layer, tileSetPosition, cartesianX, cartesianY);
-                
-                layer.addTile(tile);
-                
-                ctx.drawImage(
-                    tileMap.tileSet.image,
-                    (tileCol * tileMap.tileSet.tileHeight),
-                    (tileRow * tileMap.tileSet.tileWidth),
-                    tile.width,
-                    tile.height,
-                    tile.x,
-                    tile.y,
-                    tile.width,
-                    tile.height
-                );
-            }
+    this.tileMap.layers.forEach(function(layer) {
+        if (layer.visible) {
+            layer.render(viewX, viewY, viewWidth, viewHeight, this.tileMap, ctx);
         }
-    });
+    }, this);
 };
 
 Fibula.OrthogonalRenderer.prototype.constructor = Fibula.OrthogonalRenderer;
