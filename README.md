@@ -73,9 +73,9 @@ Now, let's create a first layer that will go on the tile map:
 ```javascript
 loader.addCompletionListener(function() {
     var tileSet = new Fibula.TileSet(tileSetImage, 32, 32),
-        tileMap = new Fibula.TileMap("my-map-name", tileSet, 640, 480, Fibula.TileMap.PROJECTION_ORTHOGONAL);
-
-    var layer1 = new Fibula.TileMapLayer("Tile Layer 1", tileMap);
+        tileMap = new Fibula.TileMap("my-map-name", tileSet, 640, 480, Fibula.TileMap.PROJECTION_ORTHOGONAL),
+        layer1 = new Fibula.TileMapLayer("Tile Layer 1", tileMap);
+        
     layer1.data = [
         [172, 172, 172, 79, 34, 34, 34, 34, 34, 34, 34, 34, 56, 57, 54, 55, 56, 147, 67, 67, 68, 79, 79, 171, 172, 172, 173, 79, 79, 55, 55, 55],
         [172, 172, 172, 79, 34, 34, 34, 34, 34, 34, 146, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172, 159, 189, 79, 79, 55, 55, 55],
@@ -117,9 +117,9 @@ working on. That's very straightforward:
 ```javascript
 loader.addCompletionListener(function() {
     var tileSet = new Fibula.TileSet(tileSetImage, 32, 32),
-        tileMap = new Fibula.TileMap("my-map-name", tileSet, 640, 480, Fibula.TileMap.PROJECTION_ORTHOGONAL);
-
-    var layer1 = new Fibula.TileMapLayer("Tile Layer 1", tileMap);
+        tileMap = new Fibula.TileMap("my-map-name", tileSet, 640, 480, Fibula.TileMap.PROJECTION_ORTHOGONAL),
+        layer1 = new Fibula.TileMapLayer("Tile Layer 1", tileMap);
+        
     layer1.data = [
         [172, 172, 172, 79, 34, 34, 34, 34, 34, 34, 34, 34, 56, 57, 54, 55, 56, 147, 67, 67, 68, 79, 79, 171, 172, 172, 173, 79, 79, 55, 55, 55],
         [172, 172, 172, 79, 34, 34, 34, 34, 34, 34, 146, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172, 159, 189, 79, 79, 55, 55, 55],
@@ -226,9 +226,9 @@ map in order for the example to be cleaner):
 ```javascript
 loader.addCompletionListener(function() {
     var tileSet = new Fibula.TileSet(tileSetImage, 64, 64),
-        tileMap = new Fibula.TileMap("isometric-map", tileSet, 320, 160, Fibula.TileMap.PROJECTION_ISOMETRIC);
-    
-    var layer1 = new Fibula.TileMapLayer("Tile Layer 1", tileMap);
+        tileMap = new Fibula.TileMap("isometric-map", tileSet, 320, 160, Fibula.TileMap.PROJECTION_ISOMETRIC),
+        layer1 = new Fibula.TileMapLayer("Tile Layer 1", tileMap);
+        
     layer1.data = [
         [3, 3, 3, 3, 3],
         [3, 3, 3, 3, 3],
@@ -244,9 +244,9 @@ Now let's render our tile map:
 ```javascript
 loader.addCompletionListener(function() {
     var tileSet = new Fibula.TileSet(tileSetImage, 64, 64),
-        tileMap = new Fibula.TileMap("isometric-map", tileSet, 320, 160, Fibula.TileMap.PROJECTION_ISOMETRIC);
-    
-    var layer1 = new Fibula.TileMapLayer("Tile Layer 1", tileMap);
+        tileMap = new Fibula.TileMap("isometric-map", tileSet, 320, 160, Fibula.TileMap.PROJECTION_ISOMETRIC),
+        layer1 = new Fibula.TileMapLayer("Tile Layer 1", tileMap);
+        
     layer1.data = [
         [3, 3, 3, 3, 3],
         [3, 3, 3, 3, 3],
