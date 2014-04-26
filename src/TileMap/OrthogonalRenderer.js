@@ -37,22 +37,25 @@ Fibula.OrthogonalRenderer.prototype.render = function(tileMap)
     tileMap.layers.forEach(function(layer) {
         for (var row = 0; row < tilesPerRow; row++) {
             for (var column = 0; column < tilesPerCol; column++) {
-                var tile = layer.data[row][column],
-                    tileRow = Math.floor(tile / tileSetColumns),
-                    tileCol = Math.floor(tile % tileSetColumns),
+                var tileSetPosition = layer.data[row][column],
+                    tileRow = Math.floor(tileSetPosition / tileSetColumns),
+                    tileCol = Math.floor(tileSetPosition % tileSetColumns),
                     cartesianX = (column * tileMap.tileSet.tileHeight),
-                    cartesianY = (row * tileMap.tileSet.tileWidth);
+                    cartesianY = (row * tileMap.tileSet.tileWidth),
+                    tile = new Fibula.Tile(layer, tileSetPosition, cartesianX, cartesianY);
+                
+                layer.addTile(tile);
                 
                 ctx.drawImage(
                     tileMap.tileSet.image,
                     (tileCol * tileMap.tileSet.tileHeight),
                     (tileRow * tileMap.tileSet.tileWidth),
-                    tileMap.tileSet.tileWidth,
-                    tileMap.tileSet.tileHeight,
-                    cartesianX,
-                    cartesianY,
-                    tileMap.tileSet.tileWidth,
-                    tileMap.tileSet.tileHeight
+                    tile.width,
+                    tile.height,
+                    tile.x,
+                    tile.y,
+                    tile.width,
+                    tile.height
                 );
             }
         }

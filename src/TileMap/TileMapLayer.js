@@ -13,9 +13,21 @@
  * @class Fibula.TileMapLayer
  * @constructor
  * @param {string} name The name of the layer.
+ * @param {Fibula.TileMap} tileMap The tile map where this layer belongs to.
  */
-Fibula.TileMapLayer = function(name)
+Fibula.TileMapLayer = function(name, tileMap)
 {
+    /**
+     * The name of the layer.
+     * @type {string}
+     */
+    this.name = name;
+    /**
+     * The tile map where this layer belongs to.
+     * @type {Fibula.TileMap}
+     */
+    this.tileMap = tileMap;
+
     /**
      * The data array containing the keys for the tile set image.
      * @type {Array}
@@ -23,10 +35,10 @@ Fibula.TileMapLayer = function(name)
     this.data = [];
 
     /**
-     * The name of the layer.
-     * @type {string}
+     * The array of tiles of this layer.
+     * @type {Array}
      */
-    this.name = name;
+    this.tiles = [];
 
     /**
      * The opacity of the layer (1 == 100%).
@@ -39,6 +51,15 @@ Fibula.TileMapLayer = function(name)
      * @type {boolean}
      */
     this.visible = true;
+};
+
+/**
+ * Adds a tile to the layer.
+ * @param {Fibula.Tile} tile The tile to add.
+ */
+Fibula.TileMapLayer.prototype.addTile = function(tile)
+{
+    this.tiles.push(tile);
 };
 
 Fibula.TileMapLayer.prototype.constructor = Fibula.TileMapLayer;
