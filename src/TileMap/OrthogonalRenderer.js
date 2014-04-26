@@ -58,6 +58,7 @@ Fibula.OrthogonalRenderer.prototype = {
         width: 100,
         height: 100
     }
+    
 };
 
 /**
@@ -66,6 +67,7 @@ Fibula.OrthogonalRenderer.prototype = {
  */
 Fibula.OrthogonalRenderer.prototype.render = function(viewArea)
 {
+    console.log(this.canvas);
     var ctx = this.canvas.getContext("2d"),
         viewX = viewArea.x || this.viewArea.x,
         viewY = viewArea.y || this.viewArea.y,

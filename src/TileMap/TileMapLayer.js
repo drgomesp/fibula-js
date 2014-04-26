@@ -131,7 +131,7 @@ Fibula.TileMapLayer.prototype.render = function(viewX, viewY, viewWidth, viewHei
         pxOffsetRemainderX = tileOffsetX * tileWidth - Math.floor(viewX),
         pxOffsetRemainderY = tileOffsetY * tileHeight - Math.floor(viewY),
 
-        tilePxX, tilePxY, x, y, tile, tileSetPosition, tileSetCoordinates;
+        tilePxX, tilePxY, x, y, tile, tileSetCoordinates;
 
     for(x = visibleTileMinX; x < visibleTileMaxX; x++) {
         for(y = visibleTileMinY; y < visibleTileMaxY; y++) {
@@ -147,9 +147,8 @@ Fibula.TileMapLayer.prototype.render = function(viewX, viewY, viewWidth, viewHei
                 continue;
             }
             
-            tileSetPosition = tile.tileSetPosition;
-            tileSetCoordinates = this.tileSet.findCoordinates(tileSetPosition, tileWidth, tileHeight);
-
+            tileSetCoordinates = this.tileSet.findCoordinates(tile.tileSetPosition, tileWidth, tileHeight);
+            
             ctx.drawImage(
                 this.tileSet.image,
 
@@ -160,8 +159,8 @@ Fibula.TileMapLayer.prototype.render = function(viewX, viewY, viewWidth, viewHei
                 tileWidth,
                 tileHeight,
 
-                tilePxX,
-                tilePxY,
+                x * tileWidth,
+                y * tileHeight,
 
                 tileWidth,
                 tileHeight

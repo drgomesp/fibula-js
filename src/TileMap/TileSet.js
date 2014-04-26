@@ -58,8 +58,8 @@ Fibula.TileSet.prototype.findCoordinates = function(index, tileWidth, tileHeight
         tileY = Math.floor(index % height);
 
     return {
-        x: tileX * tileWidth,
-        y: tileY * tileHeight
+        x: tileY * tileHeight,
+        y: tileX * tileWidth
     };
 };
 
