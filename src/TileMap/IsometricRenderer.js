@@ -38,24 +38,26 @@ Fibula.IsometricRenderer.prototype.render = function(tileMap)
     tileMap.layers.forEach(function(layer) {
         for (var row = 0; row < tilesPerRow; row++) {
             for (var column = 0; column < tilesPerCol; column++) {
-                var tile = layer.data[row][column],
-                    tileRow = Math.floor(tile / tileSetColumns),
-                    tileCol = Math.floor(tile % tileSetColumns),
+                var tileSetPosition = layer.data[row][column],
+                    tileRow = Math.floor(tileSetPosition / tileSetColumns),
+                    tileCol = Math.floor(tileSetPosition % tileSetColumns),
                     isometricX = (row - column) * (tileMap.tileSet.tileWidth / 2),
-                    isometricY = (row + column) * (tileHeightOnTileMap / 2);
+                    isometricY = (row + column) * (tileHeightOnTileMap / 2),
+                    tile = new Fibula.Tile(layer, tileSetPosition, isometricX, isometricY);
 
-                isometricX += tileMap.width / 2; // Adjust the middle of the "camera"
+                tile.x += tileMap.width / 2; // Adjust the middle of the "camera"
+                layer.addTile(tile);
                 
                 ctx.drawImage(
                     tileMap.tileSet.image,
                     tileCol * tileMap.tileSet.tileHeight,
                     tileRow * tileMap.tileSet.tileWidth,
-                    tileMap.tileSet.tileWidth,
-                    tileMap.tileSet.tileHeight,
-                    isometricX,
-                    isometricY,
-                    tileMap.tileSet.tileWidth,
-                    tileMap.tileSet.tileHeight
+                    tile.width,
+                    tile.height,
+                    tile.x,
+                    tile.y,
+                    tile.width,
+                    tile.height
                 );
             }
         }
