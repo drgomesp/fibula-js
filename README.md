@@ -32,7 +32,7 @@ Suppose you have the following tile set:
 ![orthogonal-tileset](http://i1.wp.com/blog.sklambert.com/wp-content/uploads/2013/07/tileset.png?resize=512%2C512)
 
 To get a simple example working, you first need to create a `TileSet` object. In order to do that,
-you first need to load an image using [PxLoader](https://github.com/thinkpixellab/PxLoader):
+you first need to load an image using PxLoader:
 
 ```javascript
 var loader = new PxLoader(),
@@ -217,14 +217,13 @@ layer2.data = [
 ];
 ```
 
-Now we add the second layer to the tile map, like we did for the first one, *before*
-rendering the tile map again:
+Now we add the second layer to the tile map, like we did for the first one:
 
 ```javascript
 tileMap.addLayer(layer2);
 ```
 
-The result is should look like this:
+The result should look like this:
 
 ![orthogonal-tilemap-two-layers](http://i0.wp.com/blog.sklambert.com/wp-content/uploads/2013/07/tileset_ground_and_layer.png?resize=512%2C320)
 
