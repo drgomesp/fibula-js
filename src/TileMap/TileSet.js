@@ -39,7 +39,6 @@ Fibula.TileSet.prototype = {
     image: false,
     width: false,
     height: false
-    
 };
 
 /**

@@ -12,17 +12,26 @@
  *
  * @class Fibula.TileMap
  * @constructor
- * @param {string} key The string key of the tile map.
- * @param {number} tileWidth The width of a tile in pixels.
- * @param {number} tileHeight The height of a tile in pixels.
- * @param {array}<Fibula.TileMapLayer> layers the TileMapLayers of this TileMap
+ * @param {Object} settings The settings object.
  */
 Fibula.TileMap = function(settings)
 {
-
+    /**
+     * The settings object.
+     * @type {Object}
+     */
     settings = settings || {};
 
+    /**
+     * The tile width for this tile map.
+     * @type {number}
+     */
     this.tileWidth = settings.tileWidth || this.tileWidth;
+
+    /**
+     * The tile height of this tile map.
+     * @type {number}
+     */
     this.tileHeight = settings.tileHeight || this.tileHeight;
 
     /**
@@ -42,7 +51,6 @@ Fibula.TileMap.prototype = {
     constructor: Fibula.TileMap,
     tileWidth: 32,
     tileHeight: 32,
-    layers: false, // []
+    layers: false,
     key: 'no_key'
 };
-

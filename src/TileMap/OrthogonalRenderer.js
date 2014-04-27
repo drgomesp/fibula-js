@@ -47,18 +47,14 @@ Fibula.OrthogonalRenderer = function(settings)
 };
 
 Fibula.OrthogonalRenderer.prototype = {
-    
     canvas: null,
-    
     tileMap: null,
-
     viewArea: {
         x: 0,
         y: 0,
         width: 100,
         height: 100
     }
-    
 };
 
 /**
