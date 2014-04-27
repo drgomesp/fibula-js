@@ -75,9 +75,73 @@ Fibula.OrthogonalRenderer.prototype.render = function(viewArea)
 
     this.tileMap.layers.forEach(function(layer) {
         if (layer.visible) {
-            layer.render(viewX, viewY, viewWidth, viewHeight, this.tileMap, ctx);
+            this.renderLayer(layer, viewX, viewY, viewWidth, viewHeight, this.tileMap, ctx);
         }
     }, this);
+};
+
+/**
+ * Renders the layer to the specific context using a rendering area.
+ *
+ * @param {Fibula.TileMapLayer} layer The layer to render.
+ * @param {number} viewX The x point from where to start rendering.
+ * @param {number} viewY The y point from where to start rendering.
+ * @param {number} viewWidth The width of the rendering area.
+ * @param {number} viewHeight The height of the rendering area.
+ * @param {Fibula.TileMap} tileMap The tile map.
+ * @param {CanvasRenderingContext2D} ctx The canvas context to draw on.
+ */
+Fibula.OrthogonalRenderer.prototype.renderLayer = function(layer, viewX, viewY, viewWidth, viewHeight, tileMap, ctx)
+{
+    var tileWidth = tileMap.tileWidth,
+        tileHeight = tileMap.tileHeight,
+        tileOffsetX = Math.ceil(viewX / tileWidth),
+        tileOffsetY = Math.ceil(viewY / tileHeight),
+
+        viewTileWidth = Math.ceil(viewWidth / tileWidth),
+        viewTileHeight = Math.ceil(viewHeight / tileWidth),
+
+        // Set min and max to have one more tile for half visible tiles
+        visibleTileMinX = tileOffsetX - 1,
+        visibleTileMaxX = tileOffsetX + viewTileWidth + 1,
+
+        visibleTileMinY = tileOffsetY - 1,
+        visibleTileMaxY = tileOffsetY + viewTileHeight + 1,
+
+        pxOffsetRemainderX = tileOffsetX * tileWidth - Math.floor(viewX),
+        pxOffsetRemainderY = tileOffsetY * tileHeight - Math.floor(viewY),
+
+        tilePxX, tilePxY, x, y, tile, tileSetCoordinates;
+
+    for(x = visibleTileMinX; x < visibleTileMaxX; x++) {
+        for(y = visibleTileMinY; y < visibleTileMaxY; y++) {
+
+            tilePxX = pxOffsetRemainderX + (x * tileWidth) - (tileOffsetX * tileWidth);
+            tilePxY = pxOffsetRemainderY + (y * tileHeight) - (tileOffsetY * tileHeight);
+
+            if (typeof layer.tiles[x] !== "undefined") {
+                tile = layer.tiles[x][y];
+            }
+
+            if (!tile) {
+                continue;
+            }
+
+            tileSetCoordinates = layer.tileSet.findCoordinates(tile.tileSetPosition, tileWidth, tileHeight);
+
+            ctx.drawImage(
+                layer.tileSet.image,
+                tileSetCoordinates.x,
+                tileSetCoordinates.y,
+                tileWidth,
+                tileHeight,
+                x * tileWidth,
+                y * tileHeight,
+                tileWidth,
+                tileHeight
+            );
+        }
+    }
 };
 
 Fibula.OrthogonalRenderer.prototype.constructor = Fibula.OrthogonalRenderer;
