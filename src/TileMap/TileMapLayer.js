@@ -38,7 +38,7 @@ Fibula.TileMapLayer = function(settings)
      * Weather the layer is visible or not.
      * @type {boolean}
      */
-    this.visible = settings.visible || this.visible;
+    this.visible = typeof settings.visible !== "undefined" ? settings.visible : this.visible; 
 
     /**
      * The tile set to be used with this layer.
@@ -75,8 +75,8 @@ Fibula.TileMapLayer.prototype = {
     opacity: 1,
     visible: true,
     tileSet: null,
-    width: null,
-    height: null
+    width: false,
+    height: false
 };
 
 /**
