@@ -23,10 +23,16 @@ Fibula.OrthogonalRenderer = function(settings)
     settings = settings || this.settings;
 
     /**
-     * The HTML canvas object.
-     * @type {HTMLCanvasElement}
+     * The PIXI Stage object, which is the root of the display tree. If you don't provide this, it will be auto-created.
+     * @type {PIXI.Stage}
      */
-    this.canvas = settings.canvas || this.canvas;
+    this.stage = settings.stage || this.stage;
+
+    /**
+     * The PIXI renderer object. If you don't provide this, it will be auto-detected.
+     * @type {PIXI.WebGLRenderer|PIXI.CanvasRenderer} 
+     */
+    this.renderer = settings.renderer || this.renderer;
 
     /**
      * The tile map object.
@@ -47,7 +53,8 @@ Fibula.OrthogonalRenderer = function(settings)
 };
 
 Fibula.OrthogonalRenderer.prototype = {
-    canvas: null,
+    stage: new PIXI.Stage(0xffffff, true),
+    renderer: PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight, null),
     tileMap: null,
     viewArea: {
         x: 0,
@@ -57,21 +64,36 @@ Fibula.OrthogonalRenderer.prototype = {
     }
 };
 
-/**
- * Renders the tile map to the canvas.
- * @param {Object} viewArea The object that defines the view area to render.
- */
 Fibula.OrthogonalRenderer.prototype.render = function(viewArea)
 {
-    var ctx = this.canvas.getContext("2d"),
-        viewX = viewArea.x || this.viewArea.x,
+    document.body.appendChild(this.renderer.view);
+    
+    this.createTileMap(viewArea);
+    var me = this;
+    
+    function animate()
+    {
+        requestAnimFrame(animate);
+        me.renderer.render(me.stage);
+    }
+    
+    requestAnimFrame(animate);
+};
+
+/**
+ * Creates the tile map textures.
+ * @param {Object} viewArea The object that defines the view area to render.
+ */
+Fibula.OrthogonalRenderer.prototype.createTileMap = function(viewArea)
+{
+    var viewX = viewArea.x || this.viewArea.x,
         viewY = viewArea.y || this.viewArea.y,
         viewWidth = viewArea.width || this.viewArea.width,
         viewHeight = viewArea.height || this.viewArea.height;
 
     this.tileMap.layers.forEach(function(layer) {
         if (layer.visible) {
-            this.renderLayer(layer, viewX, viewY, viewWidth, viewHeight, this.tileMap, ctx);
+            this.createLayers(layer, viewX, viewY, viewWidth, viewHeight, this.tileMap, this.stage);
         }
     }, this);
 };
@@ -85,9 +107,9 @@ Fibula.OrthogonalRenderer.prototype.render = function(viewArea)
  * @param {number} viewWidth The width of the rendering area.
  * @param {number} viewHeight The height of the rendering area.
  * @param {Fibula.TileMap} tileMap The tile map.
- * @param {CanvasRenderingContext2D} ctx The canvas context to draw on.
+ * @param {PIXI.DisplayObjectContainer} stage The PIXI Stage object.
  */
-Fibula.OrthogonalRenderer.prototype.renderLayer = function(layer, viewX, viewY, viewWidth, viewHeight, tileMap, ctx)
+Fibula.OrthogonalRenderer.prototype.createLayers = function(layer, viewX, viewY, viewWidth, viewHeight, tileMap, stage)
 {
     var tileWidth = tileMap.tileWidth,
         tileHeight = tileMap.tileHeight,
@@ -103,8 +125,10 @@ Fibula.OrthogonalRenderer.prototype.renderLayer = function(layer, viewX, viewY, 
 
         visibleTileMinY = tileOffsetY - 1,
         visibleTileMaxY = tileOffsetY + viewTileHeight + 1,
-
-        x, y, tile, tileSetCoordinates, orthogonalX, orthogonalY;
+        
+        texture = PIXI.Texture.fromImage(layer.tileSet.image.src),
+    
+        x, y, tile, tileSetCoordinates, orthogonalX, orthogonalY, sprite;
 
     for(x = visibleTileMinX; x < visibleTileMaxX; x++) {
         for(y = visibleTileMinY; y < visibleTileMaxY; y++) {
@@ -116,23 +140,19 @@ Fibula.OrthogonalRenderer.prototype.renderLayer = function(layer, viewX, viewY, 
             if (!tile) {
                 continue;
             }
-
+            
             tileSetCoordinates = layer.tileSet.findCoordinates(tile.tileSetPosition, tileWidth, tileHeight);
-
+            
             orthogonalX = x * tileWidth;
             orthogonalY = y * tileHeight;
             
-            ctx.drawImage(
-                layer.tileSet.image,
-                tileSetCoordinates.x,
-                tileSetCoordinates.y,
-                tileWidth,
-                tileHeight,
-                orthogonalX,
-                orthogonalY,
-                tileWidth,
-                tileHeight
-            );
+            sprite = new PIXI.TilingSprite(texture, tileWidth, tileHeight);
+            sprite.x = orthogonalX;
+            sprite.y = orthogonalY;
+            sprite.tilePosition.x = -tileSetCoordinates.x;
+            sprite.tilePosition.y = -tileSetCoordinates.y;
+
+            stage.addChild(sprite);
         }
     }
 };

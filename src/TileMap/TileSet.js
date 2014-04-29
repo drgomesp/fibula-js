@@ -51,8 +51,6 @@ Fibula.TileSet.prototype = {
  */
 Fibula.TileSet.prototype.findCoordinates = function(index, tileWidth, tileHeight)
 {
-    console.log(tileWidth);
-    
     var tilesPerColumn = this.width / tileWidth,
         tileX = Math.floor(index / tilesPerColumn),
         tileY = Math.floor(index % tilesPerColumn),
