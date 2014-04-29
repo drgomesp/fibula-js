@@ -4,14 +4,24 @@ A tile-based HTML5 Canvas & WebGL engine with support for orthogonal and axonome
  
 By [Daniel Ribeiro](http://github.com/drgomesp).
 
-> **Notice:** Fibula is in the early stages of development. We currently don't have 
-> many things implemented yet, but we have an extensive roadmap for a lot of important
-> things that will come up soon enough, such as WebGL rendering, Tiled support and so on.
+Features
+-----
+
+- Orthogonal tile maps
+- Isometric tile maps
+- Tile map layers with visibility and opacity
+- Camera simulation on tile maps
+
+*Coming soon*
+
+- Dimetric tile maps
+- Trimetric tile maps
+- [Tiled](http://www.mapeditor.org/) support for easily creating tile maps
 
 Dependencies
 -----
 
-- [PxLoader](https://github.com/thinkpixellab/PxLoader) – Preloader and resource downloader
+- [Pixi.js](https://github.com/GoodBoyDigital/pixi.js) – 2d WebGL renderer with canvas fallback
 
 Getting Started
 -----
@@ -20,6 +30,9 @@ Getting Started
 
 The simplest way to draw a tile map is to manually create the tile set, the layers 
 and the actual map itself. Those are the basic components that make a tile map at the end.
+
+> **Notice:** **Fibula** requires all image resources to be previously loaded. You can solve this
+> issue by using asset management libraries, such as [PxLoader](https://github.com/thinkpixellab/PxLoader).
 
 #### Orthogonal tile map
 
@@ -31,8 +44,8 @@ Suppose you have the following tile set:
 
 ![orthogonal-tileset](http://i1.wp.com/blog.sklambert.com/wp-content/uploads/2013/07/tileset.png?resize=512%2C512)
 
-To get a simple example working, you first need to create a `TileSet` object. In order to do that,
-you first need to load an image using PxLoader:
+To get a simple example working, you first need to create a `TileSet` object. We're going to use
+PxLoader to show you how to solve the asset management issue:
 
 ```javascript
 var loader = new PxLoader(),
@@ -44,27 +57,26 @@ which will run as soon as the image is loaded and ready:
 
 ```javascript
 loader.addCompletionListener(function() {
-    var tileSet = new Fibula.TileSet(tileSetImage, 32, 32);
+    var tileSet = new Fibula.TileSet(tileSetImage);
 });
 ```
 
-Here, we've passed the background image, the tile width and the tile height.
+Here, we've passed the background image.
 
 After having created a `TileSet` object, we need two more steps: 
 
-1. Create the actual tile map.
-2. Create the layers that will hold the background data information.
-3. Render the tile map to the canvas object.
+1. Create a first tile layer
+2. Create the tile map and add the first layer to it
+3. Create a renderer and actually render the tile map
 
-So let's create the tile map by using the `TileMap` object:
+So let's create the first tile layer, using the `TileMapLayer` object:
 
 > *Notice:* All code from here will be place inside the addCompletionListener callback
 function.
 
 ```javascript
 loader.addCompletionListener(function() {
-    var tileSet = new Fibula.TileSet(tileSetImage, 32, 32),
-        tileMap = new Fibula.TileMap("my-map-name", tileSet, 640, 480, Fibula.TileMap.PROJECTION_ORTHOGONAL);
+    var tileSet = new Fibula.TileSet(tileSetImage);
 });
 ```
 
@@ -72,37 +84,42 @@ Now, let's create a first layer that will go on the tile map:
 
 ```javascript
 loader.addCompletionListener(function() {
-    var tileSet = new Fibula.TileSet(tileSetImage, 32, 32),
-        tileMap = new Fibula.TileMap("my-map-name", tileSet, 640, 480, Fibula.TileMap.PROJECTION_ORTHOGONAL),
-        layer1 = new Fibula.TileMapLayer("Tile Layer 1", tileMap);
-        
-    layer1.data = [
-        [172, 172, 172, 79, 34, 34, 34, 34, 34, 34, 34, 34, 56, 57, 54, 55, 56, 147, 67, 67, 68, 79, 79, 171, 172, 172, 173, 79, 79, 55, 55, 55],
-        [172, 172, 172, 79, 34, 34, 34, 34, 34, 34, 146, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172, 159, 189, 79, 79, 55, 55, 55],
-        [172, 172, 172, 79, 79, 34, 34, 34, 34, 34, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 159, 189, 79, 79, 79, 55, 55, 55],
-        [188, 188, 188, 79, 79, 79, 79, 34, 34, 34, 36, 172, 172, 143, 142, 157, 79, 79, 79, 79, 79, 79, 187, 159, 189, 79, 79, 79, 55, 55, 55, 55],
-        [79, 79, 79, 79, 79, 79, 79, 79, 34, 34, 36, 172, 159, 158, 172, 143, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 39, 51, 51, 51, 55, 55],
-        [79, 79, 79, 79, 79, 79, 79, 79, 79, 34, 36, 172, 143, 142, 172, 172, 143, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 55],
-        [79, 79, 79, 79, 79, 79, 79, 79, 79, 34, 52, 172, 172, 172, 172, 172, 172, 143, 156, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79],
-        [79, 79, 79, 79, 79, 79, 79, 79, 79, 34, 52, 172, 172, 172, 172, 172, 172, 159, 188, 189, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79],
-        [79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 188, 158, 172, 172, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 187, 158, 159, 189, 79, 79, 79],
-        [79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 159, 188, 189, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
-        [79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
-        [155, 142, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 187, 188, 188, 189, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
-        [171, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
-        [171, 172, 143, 156, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 187, 189, 79, 79, 79, 79],
-        [187, 188, 158, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79],
-        [79, 79, 79, 188, 189, 79, 79, 79, 79, 79, 79, 155, 156, 156, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 156],
-        [34, 34, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172],
-        [34, 34, 34, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172],
-        [34, 34, 34, 34, 79, 79, 79, 79, 79, 79, 155, 172, 172, 159, 189, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172],
-        [34, 34, 34, 34, 34, 34, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172, 172]
-    ];
+    var tileSet = new Fibula.TileSet(tileSetImage),
+        layer1data = [
+            [172, 172, 172, 79, 34, 34, 34, 34, 34, 34, 34, 34, 56, 57, 54, 55, 56, 147, 67, 67, 68, 79, 79, 171, 172, 172, 173, 79, 79, 55, 55, 55],
+            [172, 172, 172, 79, 34, 34, 34, 34, 34, 34, 146, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172, 159, 189, 79, 79, 55, 55, 55],
+            [172, 172, 172, 79, 79, 34, 34, 34, 34, 34, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 159, 189, 79, 79, 79, 55, 55, 55],
+            [188, 188, 188, 79, 79, 79, 79, 34, 34, 34, 36, 172, 172, 143, 142, 157, 79, 79, 79, 79, 79, 79, 187, 159, 189, 79, 79, 79, 55, 55, 55, 55],
+            [79, 79, 79, 79, 79, 79, 79, 79, 34, 34, 36, 172, 159, 158, 172, 143, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 39, 51, 51, 51, 55, 55],
+            [79, 79, 79, 79, 79, 79, 79, 79, 79, 34, 36, 172, 143, 142, 172, 172, 143, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 55],
+            [79, 79, 79, 79, 79, 79, 79, 79, 79, 34, 52, 172, 172, 172, 172, 172, 172, 143, 156, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79],
+            [79, 79, 79, 79, 79, 79, 79, 79, 79, 34, 52, 172, 172, 172, 172, 172, 172, 159, 188, 189, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79],
+            [79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 188, 158, 172, 172, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 187, 158, 159, 189, 79, 79, 79],
+            [79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 159, 188, 189, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
+            [79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
+            [155, 142, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 187, 188, 188, 189, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
+            [171, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
+            [171, 172, 143, 156, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 187, 189, 79, 79, 79, 79],
+            [187, 188, 158, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79],
+            [79, 79, 79, 188, 189, 79, 79, 79, 79, 79, 79, 155, 156, 156, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 156],
+            [34, 34, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172],
+            [34, 34, 34, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172],
+            [34, 34, 34, 34, 79, 79, 79, 79, 79, 79, 155, 172, 172, 159, 189, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172],
+            [34, 34, 34, 34, 34, 34, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172, 172]
+        ];
+            
+    var layer1 = new Fibula.TileMapLayer({
+         name: 'layer 1',
+         tileSet: tileSet,
+         data: layer1data,
+         visible: true,
+         opacity: 1
+     });    
 });
 ```
 
-Here we are doing some basic 2D mapping. The `data` property is a 2D simple array that
-holds 20 rows and 32 columns – which are the dimensions for our tile map, as you'll see
+Here we are doing some basic 2D mapping. The `layer1data` variable holds a simple 2d array
+with 20 rows and 32 columns – which are the dimensions – in *tiles* – for our tile map, as you'll see
 later. The numbers of each individual cell represents a spot on the tile set.
 
 To understand this better, imagine you have each individual tile on the tile set
@@ -111,44 +128,72 @@ following image:
 
 ![orthogonal-tileset-marked](http://i2.wp.com/blog.sklambert.com/wp-content/uploads/2013/07/tileset_marked.png?resize=513%2C513)
 
-So the next step is to actually render the tile set to the canvas object we're 
-working on. That's very straightforward:
+So the next step is to create the `TileMap` object and the `Renderer` that will render it:
 
 ```javascript
 loader.addCompletionListener(function() {
-    var tileSet = new Fibula.TileSet(tileSetImage, 32, 32),
-        tileMap = new Fibula.TileMap("my-map-name", tileSet, 640, 480, Fibula.TileMap.PROJECTION_ORTHOGONAL),
-        layer1 = new Fibula.TileMapLayer("Tile Layer 1", tileMap);
-        
-    layer1.data = [
-        [172, 172, 172, 79, 34, 34, 34, 34, 34, 34, 34, 34, 56, 57, 54, 55, 56, 147, 67, 67, 68, 79, 79, 171, 172, 172, 173, 79, 79, 55, 55, 55],
-        [172, 172, 172, 79, 34, 34, 34, 34, 34, 34, 146, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172, 159, 189, 79, 79, 55, 55, 55],
-        [172, 172, 172, 79, 79, 34, 34, 34, 34, 34, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 159, 189, 79, 79, 79, 55, 55, 55],
-        [188, 188, 188, 79, 79, 79, 79, 34, 34, 34, 36, 172, 172, 143, 142, 157, 79, 79, 79, 79, 79, 79, 187, 159, 189, 79, 79, 79, 55, 55, 55, 55],
-        [79, 79, 79, 79, 79, 79, 79, 79, 34, 34, 36, 172, 159, 158, 172, 143, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 39, 51, 51, 51, 55, 55],
-        [79, 79, 79, 79, 79, 79, 79, 79, 79, 34, 36, 172, 143, 142, 172, 172, 143, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 55],
-        [79, 79, 79, 79, 79, 79, 79, 79, 79, 34, 52, 172, 172, 172, 172, 172, 172, 143, 156, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79],
-        [79, 79, 79, 79, 79, 79, 79, 79, 79, 34, 52, 172, 172, 172, 172, 172, 172, 159, 188, 189, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79],
-        [79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 188, 158, 172, 172, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 187, 158, 159, 189, 79, 79, 79],
-        [79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 159, 188, 189, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
-        [79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
-        [155, 142, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 187, 188, 188, 189, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
-        [171, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
-        [171, 172, 143, 156, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 187, 189, 79, 79, 79, 79],
-        [187, 188, 158, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79],
-        [79, 79, 79, 188, 189, 79, 79, 79, 79, 79, 79, 155, 156, 156, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 156],
-        [34, 34, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172],
-        [34, 34, 34, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172],
-        [34, 34, 34, 34, 79, 79, 79, 79, 79, 79, 155, 172, 172, 159, 189, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172],
-        [34, 34, 34, 34, 34, 34, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172, 172]
-    ];
-
-    var canvas = document.getElementById("main");
-    tileMap.render(canvas);
+    var tileSet = new Fibula.TileSet(tileSetImage),
+        layer1data = [
+            [172, 172, 172, 79, 34, 34, 34, 34, 34, 34, 34, 34, 56, 57, 54, 55, 56, 147, 67, 67, 68, 79, 79, 171, 172, 172, 173, 79, 79, 55, 55, 55],
+            [172, 172, 172, 79, 34, 34, 34, 34, 34, 34, 146, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172, 159, 189, 79, 79, 55, 55, 55],
+            [172, 172, 172, 79, 79, 34, 34, 34, 34, 34, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 159, 189, 79, 79, 79, 55, 55, 55],
+            [188, 188, 188, 79, 79, 79, 79, 34, 34, 34, 36, 172, 172, 143, 142, 157, 79, 79, 79, 79, 79, 79, 187, 159, 189, 79, 79, 79, 55, 55, 55, 55],
+            [79, 79, 79, 79, 79, 79, 79, 79, 34, 34, 36, 172, 159, 158, 172, 143, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 39, 51, 51, 51, 55, 55],
+            [79, 79, 79, 79, 79, 79, 79, 79, 79, 34, 36, 172, 143, 142, 172, 172, 143, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 55],
+            [79, 79, 79, 79, 79, 79, 79, 79, 79, 34, 52, 172, 172, 172, 172, 172, 172, 143, 156, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79],
+            [79, 79, 79, 79, 79, 79, 79, 79, 79, 34, 52, 172, 172, 172, 172, 172, 172, 159, 188, 189, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79],
+            [79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 188, 158, 172, 172, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 187, 158, 159, 189, 79, 79, 79],
+            [79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 159, 188, 189, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
+            [79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
+            [155, 142, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 187, 188, 188, 189, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
+            [171, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 173, 79, 79, 79, 79],
+            [171, 172, 143, 156, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 187, 189, 79, 79, 79, 79],
+            [187, 188, 158, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79],
+            [79, 79, 79, 188, 189, 79, 79, 79, 79, 79, 79, 155, 156, 156, 157, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 156],
+            [34, 34, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172],
+            [34, 34, 34, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172],
+            [34, 34, 34, 34, 79, 79, 79, 79, 79, 79, 155, 172, 172, 159, 189, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 171, 172, 172],
+            [34, 34, 34, 34, 34, 34, 79, 79, 79, 79, 171, 172, 172, 173, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 155, 142, 172, 172]
+        ];
+            
+    var layer1 = new Fibula.TileMapLayer({
+         name: 'layer 1',
+         tileSet: tileSet,
+         data: layer1data,
+         visible: true,
+         opacity: 1
+     });
+     
+    var tileMap = new Fibula.TileMap({
+        tileWidth: 32,
+        tileHeight: 32,
+        layers: [layer1]
+    });
+    
+    var renderer = new Fibula.OrthogonalRenderer({
+        tileMap: tileMap
+    });
 });
 ```
 
-Now we just need to get the canvas object and render the tile map:
+Here you see the usage of the `OrthogonalRenderer`, that knows how to render an
+orthogonal tile map, and the actual `TileMap` object, holding the first layer.
+
+The last step is to render the tile map. Here's an interesting part: you get to 
+simulate a camera viewport and choose what part of the map is going to be rendered
+and also the size of the camera viewport:
+
+```javascript
+renderer.render({
+    x: 0,
+    y: 0,
+    width: 1024,
+    height: 640
+});
+```
+
+Here, we are rendering the whole map, starting by 0 on the `x` axis – left to right – and
+0 on the `y` axis – from top to bottom.
 
 Now, outside of the PxLoader callback function, we'll start to load the images and
 the callback function will be triggered as soon as everything is ready:
@@ -166,8 +211,7 @@ map, and it's not very interesting. Let's create a second layer to add some obje
 on top of the ground:
 
 ```javascript
-var layer2 = new Fibula.TileMapLayer("Tile Layer 2", tileMap);
-layer2.data = [
+var layer2data = [
     [0, 0, 32, 33, 0, 236, 0, 0, 236, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 32, 33],
     [0, 0, 48, 49, 0, 236, 220, 220, 236, 0, 0, 147, 72, 73, 70, 71, 72, 73, 83, 83, 84, 85, 0, 0, 0, 0, 0, 48, 49],
     [0, 0, 64, 65, 54, 0, 236, 236, 0, 0, 162, 163, 84, 89, 86, 87, 88, 89, 99, 99, 100, 101, 0, 0, 0, 0, 7, 112, 113],
@@ -189,6 +233,14 @@ layer2.data = [
     [0, 0, 0, 0, 40, 19, 24, 25, 8, 9, 0, 0, 0, 0, 0, 48, 49, 50, 51, 52, 115, 3, 4, 0, 0, 0, 0, 0, 249, 250],
     [0, 0, 0, 0, 0, 0, 40, 41, 20, 21, 0, 0, 0, 0, 0, 64, 65, 66, 67, 52, 19, 19, 20, 21]
 ];
+
+var layer2 = new Fibula.TileMapLayer({
+    name: 'layer 2',
+    tileSet: tileSet,
+    data: layer2data,
+    visible: true,
+    opacity: 1
+});
 ```
 
 After the render, the result should look like this:
@@ -199,6 +251,22 @@ Amazing, right?!
 
 With the layering system, you can work with collision detection by having the ability
 to decide which layer will the player collide against and which the player will not. 
+
+Now, you can simulate a camera by passing custom view areas for the renderer:
+
+```javascript
+renderer.render({
+    x: 200,
+    y: 200,
+    width: 300,
+    height: 300
+});
+```
+
+Here, we're using a camera with 300x300 dimensions and we start rendering the map on the 
+200 pixel of the `x` axis and 200 pixel of the `y` axis. The result should look like this:
+
+![orthogonal-tilemap-two-layers-camera](https://www.dropbox.com/s/axzkx8d9nujr3y5/Captura%20de%20Tela%202014-04-29%20%C3%A0s%2020.45.13.png)
 
 #### Isometric tile map
 
