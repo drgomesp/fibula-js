@@ -87,15 +87,19 @@ Fibula.TileMapLayer.prototype = {
 Fibula.TileMapLayer.prototype.fillTiles = function(data)
 {
     this.tiles = [];
-    this.height = this.width = data.length;
+    this.height = data.length;
+    this.width= data[0].length;
     
-    for(var x = 0; x < this.width; x++) {
+    var pos;
+    
+    for(var x = 0; x < data.length; x++) {
         if (typeof this.tiles[x] === "undefined") {
             this.tiles[x] = [];
         }
         
         for(var y = 0; y < this.height; y++) {
-            this.tiles[x][y] = new Fibula.Tile(x, y, data[y][x]);
+            pos = data[y][x] != null ? data[y][x] : NaN;
+            this.tiles[x][y] = new Fibula.Tile(x, y, pos);
         }
     }
 };

@@ -23,10 +23,16 @@ Fibula.IsometricRenderer = function(settings)
     settings = settings || this.settings;
 
     /**
-     * The HTML canvas object.
-     * @type {HTMLCanvasElement}
+     * The PIXI Stage object, which is the root of the display tree. If you don't provide this, it will be auto-created.
+     * @type {PIXI.Stage}
      */
-    this.canvas = settings.canvas || this.canvas;
+    this.stage = settings.stage || this.stage;
+
+    /**
+     * The PIXI renderer object. If you don't provide this, it will be auto-detected.
+     * @type {PIXI.WebGLRenderer|PIXI.CanvasRenderer}
+     */
+    this.renderer = settings.renderer || this.renderer;
 
     /**
      * The tile map object.
@@ -47,8 +53,8 @@ Fibula.IsometricRenderer = function(settings)
 };
 
 Fibula.IsometricRenderer.prototype = {
-    canvas: null,
-    tileMap: null,
+    stage: new PIXI.Stage(0xffffff, true),
+    renderer: PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight, null),
     viewArea: {
         x: 0,
         y: 0,
@@ -63,15 +69,30 @@ Fibula.IsometricRenderer.prototype = {
  */
 Fibula.IsometricRenderer.prototype.render = function(viewArea)
 {
-    var ctx = this.canvas.getContext("2d"),
-        viewX = viewArea.x || this.viewArea.x,
+    document.body.appendChild(this.renderer.view);
+
+    this.createTileMap(viewArea);
+    var me = this;
+
+    function animate()
+    {
+        requestAnimFrame(animate);
+        me.renderer.render(me.stage);
+    }
+
+    requestAnimFrame(animate);
+};
+
+Fibula.IsometricRenderer.prototype.createTileMap = function(viewArea)
+{
+    var viewX = viewArea.x || this.viewArea.x,
         viewY = viewArea.y || this.viewArea.y,
         viewWidth = viewArea.width || this.viewArea.width,
         viewHeight = viewArea.height || this.viewArea.height;
 
     this.tileMap.layers.forEach(function(layer) {
         if (layer.visible) {
-            this.renderLayer(layer, viewX, viewY, viewWidth, viewHeight, this.tileMap, ctx);
+            this.createLayers(layer, viewX, viewY, viewWidth, viewHeight, this.tileMap, this.stage);
         }
     }, this);
 };
@@ -85,9 +106,9 @@ Fibula.IsometricRenderer.prototype.render = function(viewArea)
  * @param {number} viewWidth The width of the rendering area.
  * @param {number} viewHeight The height of the rendering area.
  * @param {Fibula.TileMap} tileMap The tile map.
- * @param {CanvasRenderingContext2D} ctx The canvas context to draw on.
+ * @param {PIXI.DisplayObjectContainer} stage The PIXI Stage object.
  */
-Fibula.IsometricRenderer.prototype.renderLayer = function(layer, viewX, viewY, viewWidth, viewHeight, tileMap, ctx)
+Fibula.IsometricRenderer.prototype.createLayers = function(layer, viewX, viewY, viewWidth, viewHeight, tileMap, stage)
 {
     var tileWidth = tileMap.tileWidth,
         tileHeight = tileMap.tileHeight * 2,
@@ -103,8 +124,10 @@ Fibula.IsometricRenderer.prototype.renderLayer = function(layer, viewX, viewY, v
 
         visibleTileMinY = tileOffsetY - 1,
         visibleTileMaxY = tileOffsetY + viewTileHeight + 1,
+
+        texture = PIXI.Texture.fromImage(layer.tileSet.image.src),
         
-        x, y, tile, tileSetCoordinates, isometricX, isometricY;
+        x, y, tile, tileSetCoordinates, isometricX, isometricY, sprite;
 
     for(x = visibleTileMinX; x < visibleTileMaxX; x++) {
         for(y = visibleTileMinY; y < visibleTileMaxY; y++) {
@@ -122,19 +145,15 @@ Fibula.IsometricRenderer.prototype.renderLayer = function(layer, viewX, viewY, v
             isometricX = (x - y) * (tileWidth / 2);
             isometricY = (x + y) * (tileHeight / 4); // Divide by 4 to get the 2:1 ratio (i.e.: 64x32)
             
-            isometricX += tileMap.tileWidth * 2; // Adjust the center of the "camera"
+            isometricX += tileWidth * 2; // Adjust the center of the "camera"
+
+            sprite = new PIXI.TilingSprite(texture, tileWidth, tileHeight);
+            sprite.x = isometricX;
+            sprite.y = isometricY;
+            sprite.tilePosition.x = -tileSetCoordinates.x;
+            sprite.tilePosition.y = -tileSetCoordinates.y;
             
-            ctx.drawImage(
-                layer.tileSet.image,
-                tileSetCoordinates.x,
-                tileSetCoordinates.y,
-                tileWidth,
-                tileHeight,
-                isometricX,
-                isometricY,
-                tileWidth,
-                tileHeight
-            );
+            stage.addChild(sprite);
         }
     }
 };
