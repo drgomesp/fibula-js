@@ -266,7 +266,7 @@ renderer.render({
 Here, we're using a camera with 300x300 dimensions and we start rendering the map on the 
 200 pixel of the `x` axis and 200 pixel of the `y` axis. The result should look like this:
 
-![orthogonal-tilemap-two-layers-camera](https://www.dropbox.com/s/axzkx8d9nujr3y5/Captura%20de%20Tela%202014-04-29%20%C3%A0s%2020.45.13.png)
+![orthogonal-tilemap-two-layers-camera](http://s13.postimg.org/9gdse24tz/Captura_de_Tela_2014_04_29_s_20_45_13.png)
 
 #### Isometric tile map
 
