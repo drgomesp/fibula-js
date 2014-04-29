@@ -49,8 +49,8 @@ Fibula.TileMap = function(settings)
 
 Fibula.TileMap.prototype = {
     constructor: Fibula.TileMap,
-    tileWidth: 32,
-    tileHeight: 32,
+    tileWidth: false,
+    tileHeight: false,
     layers: false,
     key: 'no_key'
 };

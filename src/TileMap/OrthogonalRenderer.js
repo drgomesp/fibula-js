@@ -95,7 +95,7 @@ Fibula.OrthogonalRenderer.prototype.renderLayer = function(layer, viewX, viewY, 
         tileOffsetY = Math.ceil(viewY / tileHeight),
 
         viewTileWidth = Math.ceil(viewWidth / tileWidth),
-        viewTileHeight = Math.ceil(viewHeight / tileWidth),
+        viewTileHeight = Math.ceil(viewHeight / tileHeight),
 
         // Set min and max to have one more tile for half visible tiles
         visibleTileMinX = tileOffsetX - 1,
@@ -104,16 +104,10 @@ Fibula.OrthogonalRenderer.prototype.renderLayer = function(layer, viewX, viewY, 
         visibleTileMinY = tileOffsetY - 1,
         visibleTileMaxY = tileOffsetY + viewTileHeight + 1,
 
-        pxOffsetRemainderX = tileOffsetX * tileWidth - Math.floor(viewX),
-        pxOffsetRemainderY = tileOffsetY * tileHeight - Math.floor(viewY),
-
-        tilePxX, tilePxY, x, y, tile, tileSetCoordinates;
+        x, y, tile, tileSetCoordinates, orthogonalX, orthogonalY;
 
     for(x = visibleTileMinX; x < visibleTileMaxX; x++) {
         for(y = visibleTileMinY; y < visibleTileMaxY; y++) {
-
-            tilePxX = pxOffsetRemainderX + (x * tileWidth) - (tileOffsetX * tileWidth);
-            tilePxY = pxOffsetRemainderY + (y * tileHeight) - (tileOffsetY * tileHeight);
 
             if (typeof layer.tiles[x] !== "undefined") {
                 tile = layer.tiles[x][y];
@@ -125,14 +119,17 @@ Fibula.OrthogonalRenderer.prototype.renderLayer = function(layer, viewX, viewY, 
 
             tileSetCoordinates = layer.tileSet.findCoordinates(tile.tileSetPosition, tileWidth, tileHeight);
 
+            orthogonalX = x * tileWidth;
+            orthogonalY = y * tileHeight;
+            
             ctx.drawImage(
                 layer.tileSet.image,
                 tileSetCoordinates.x,
                 tileSetCoordinates.y,
                 tileWidth,
                 tileHeight,
-                x * tileWidth,
-                y * tileHeight,
+                orthogonalX,
+                orthogonalY,
                 tileWidth,
                 tileHeight
             );

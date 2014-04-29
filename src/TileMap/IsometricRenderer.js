@@ -12,56 +12,131 @@
  *
  * @class Fibula.IsometricRenderer
  * @constructor
- * @param {HTMLCanvasElement} canvas The canvas to render on.
+ * @param {Object} settings The settings object
  */
-Fibula.IsometricRenderer = function(canvas)
+Fibula.IsometricRenderer = function(settings)
 {
     /**
-     * The canvas to render on.
+     * The settings object.
+     * @type {Object}
+     */
+    settings = settings || this.settings;
+
+    /**
+     * The HTML canvas object.
      * @type {HTMLCanvasElement}
      */
-    this.canvas = canvas;
+    this.canvas = settings.canvas || this.canvas;
+
+    /**
+     * The tile map object.
+     * @type {Fibula.TileMap}
+     */
+    this.tileMap = settings.tileMap || this.tileMap;
+
+    /**
+     * The view area object.
+     * @type {Object}
+     */
+    this.viewArea = {
+        x: this.viewArea.x,
+        y: this.viewArea.y,
+        width: this.viewArea.width,
+        height: this.viewArea.height
+    };
+};
+
+Fibula.IsometricRenderer.prototype = {
+    canvas: null,
+    tileMap: null,
+    viewArea: {
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100
+    }
 };
 
 /**
  * Renders the tile map to the canvas.
- * @param {Fibula.TileMap} tileMap The tile map to render against the canvas.
+ * @param {Object} viewArea The object that defines the view area to render.
  */
-Fibula.IsometricRenderer.prototype.render = function(tileMap)
+Fibula.IsometricRenderer.prototype.render = function(viewArea)
 {
-    var ctx = this.canvas.getContext('2d'),
-        tileHeightOnTileMap = (tileMap.tileSet.tileHeight / 2),// divide the height by 2 because it's isometric 
-        tilesPerRow = tileMap.height / tileHeightOnTileMap,
-        tilesPerCol = tileMap.width / tileMap.tileSet.tileWidth,
-        tileSetColumns = tileMap.tileSet.width / tileMap.tileSet.tileWidth;
-    
-    tileMap.layers.forEach(function(layer) {
-        for (var row = 0; row < tilesPerRow; row++) {
-            for (var column = 0; column < tilesPerCol; column++) {
-                var tileSetPosition = layer.data[row][column],
-                    tileRow = Math.floor(tileSetPosition / tileSetColumns),
-                    tileCol = Math.floor(tileSetPosition % tileSetColumns),
-                    isometricX = (row - column) * (tileMap.tileSet.tileWidth / 2),
-                    isometricY = (row + column) * (tileHeightOnTileMap / 2),
-                    tile = new Fibula.Tile(layer, tileSetPosition, isometricX, isometricY);
+    var ctx = this.canvas.getContext("2d"),
+        viewX = viewArea.x || this.viewArea.x,
+        viewY = viewArea.y || this.viewArea.y,
+        viewWidth = viewArea.width || this.viewArea.width,
+        viewHeight = viewArea.height || this.viewArea.height;
 
-                tile.x += tileMap.width / 2; // Adjust the middle of the "camera"
-                layer.addTile(tile);
-                
-                ctx.drawImage(
-                    tileMap.tileSet.image,
-                    tileCol * tileMap.tileSet.tileHeight,
-                    tileRow * tileMap.tileSet.tileWidth,
-                    tile.width,
-                    tile.height,
-                    tile.x,
-                    tile.y,
-                    tile.width,
-                    tile.height
-                );
-            }
+    this.tileMap.layers.forEach(function(layer) {
+        if (layer.visible) {
+            this.renderLayer(layer, viewX, viewY, viewWidth, viewHeight, this.tileMap, ctx);
         }
-    });
+    }, this);
+};
+
+/**
+ * Renders the layer to the specific context using a rendering area.
+ *
+ * @param {Fibula.TileMapLayer} layer The layer to render.
+ * @param {number} viewX The x point from where to start rendering.
+ * @param {number} viewY The y point from where to start rendering.
+ * @param {number} viewWidth The width of the rendering area.
+ * @param {number} viewHeight The height of the rendering area.
+ * @param {Fibula.TileMap} tileMap The tile map.
+ * @param {CanvasRenderingContext2D} ctx The canvas context to draw on.
+ */
+Fibula.IsometricRenderer.prototype.renderLayer = function(layer, viewX, viewY, viewWidth, viewHeight, tileMap, ctx)
+{
+    var tileWidth = tileMap.tileWidth,
+        tileHeight = tileMap.tileHeight * 2,
+        tileOffsetX = Math.ceil(viewX / tileWidth),
+        tileOffsetY = Math.ceil(viewY / tileHeight),
+
+        viewTileWidth = Math.ceil(viewWidth / tileWidth),
+        viewTileHeight = Math.ceil(viewHeight / tileHeight),
+
+        // Set min and max to have one more tile for half visible tiles
+        visibleTileMinX = tileOffsetX - 1,
+        visibleTileMaxX = tileOffsetX + viewTileWidth + 1,
+
+        visibleTileMinY = tileOffsetY - 1,
+        visibleTileMaxY = tileOffsetY + viewTileHeight + 1,
+        
+        x, y, tile, tileSetCoordinates, isometricX, isometricY;
+
+    for(x = visibleTileMinX; x < visibleTileMaxX; x++) {
+        for(y = visibleTileMinY; y < visibleTileMaxY; y++) {
+
+            if (typeof layer.tiles[x] !== "undefined") {
+                tile = layer.tiles[x][y];
+            }
+            
+            if (!tile) {
+                continue;
+            }
+
+            tileSetCoordinates = layer.tileSet.findCoordinates(tile.tileSetPosition, tileWidth, tileHeight);
+
+            isometricX = (x - y) * (tileWidth / 2);
+            isometricY = (x + y) * (tileHeight / 4); // Divide by 4 to get the 2:1 ratio (i.e.: 64x32)
+            
+            isometricX += tileMap.tileWidth * 2; // Adjust the center of the "camera"
+            
+            ctx.drawImage(
+                layer.tileSet.image,
+                tileSetCoordinates.x,
+                tileSetCoordinates.y,
+                tileWidth,
+                tileHeight,
+                isometricX,
+                isometricY,
+                tileWidth,
+                tileHeight
+            );
+        }
+    }
 };
 
 Fibula.IsometricRenderer.prototype.constructor = Fibula.IsometricRenderer;

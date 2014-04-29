@@ -51,15 +51,15 @@ Fibula.TileSet.prototype = {
  */
 Fibula.TileSet.prototype.findCoordinates = function(index, tileWidth, tileHeight)
 {
-    var width = this.width / tileWidth,
-        height = this.height / tileHeight,
-        tileX = Math.floor(index / width),// It's stupid to use bit wise, as Math.floor is more readable (ant the performance is really not affected here)
-        tileY = Math.floor(index % height);
-
-    return {
-        x: tileY * tileHeight,
-        y: tileX * tileWidth
-    };
+    console.log(tileWidth);
+    
+    var tilesPerColumn = this.width / tileWidth,
+        tileX = Math.floor(index / tilesPerColumn),
+        tileY = Math.floor(index % tilesPerColumn),
+        x = tileY * tileHeight,
+        y = tileX * tileWidth;
+    
+    return {x: x, y: y};
 };
 
 Fibula.TileSet.prototype.constructor = Fibula.TileSet;

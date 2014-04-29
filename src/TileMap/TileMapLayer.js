@@ -71,7 +71,7 @@ Fibula.TileMapLayer = function(settings)
 
 Fibula.TileMapLayer.prototype = {
     name: 'no_name',
-    tiles: null,
+    tiles: false,
     opacity: 1,
     visible: true,
     tileSet: null,
@@ -87,8 +87,7 @@ Fibula.TileMapLayer.prototype = {
 Fibula.TileMapLayer.prototype.fillTiles = function(data)
 {
     this.tiles = [];
-    this.height = data.length;
-    this.width = data[0].length;
+    this.height = this.width = data.length;
     
     for(var x = 0; x < this.width; x++) {
         if (typeof this.tiles[x] === "undefined") {
