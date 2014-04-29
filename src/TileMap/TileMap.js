@@ -9,109 +9,48 @@
 
 /**
  * Creates a new TileMap object.
- * 
+ *
  * @class Fibula.TileMap
  * @constructor
- * @param {string} key The string key of the tile map.
- * @param {Fibula.TileSet} tileSet The tile set to load on the tile map.
- * @param {number} width The width of the tile map.
- * @param {number} height The height of the tile map.
- * @param {string} projection The projection of the tile map.
+ * @param {Object} settings The settings object.
  */
-Fibula.TileMap = function(key, tileSet, width, height, projection)
+Fibula.TileMap = function(settings)
 {
     /**
-     * The string key of the tile map.
-     * @type {string}
+     * The settings object.
+     * @type {Object}
      */
-    this.key = key;
-    
-    /**
-     * The tile set to load on the tile map.
-     * @type {Fibula.TileSet}
-     */
-    this.tileSet = tileSet;
+    settings = settings || {};
 
     /**
-     * The width of the tile map.
+     * The tile width for this tile map.
      * @type {number}
      */
-    this.width = width;
+    this.tileWidth = settings.tileWidth || this.tileWidth;
 
     /**
-     * The height of the tile map.
+     * The tile height of this tile map.
      * @type {number}
      */
-    this.height = height;
-
-    /**
-     * The projection of the tile map (isometric, orthogonal)
-     * @type {string}
-     */
-    this.projection = projection;
+    this.tileHeight = settings.tileHeight || this.tileHeight;
 
     /**
      * The array of tile map layers.
      * @type {Array}<Fibula.TileMapLayer>
      */
-    this.layers = [];
-
+    this.layers = settings.layers || [];
     /**
-     * The renderer strategy to render the tile map.
-     * @type {Fibula.OrthogonalRenderer|Fibula.IsometricRenderer}
+     * The string key of the tile map.
+     * @type {string}
      */
-    this.renderer = null;
+    this.key = settings.key || this.key;
+
 };
 
-/**
- * The orthogonal projection type constant.
- * @type {string}
- */
-Fibula.TileMap.PROJECTION_ORTHOGONAL = "orthogonal";
-
-/**
- * The isometric projection type constant.
- * @type {string}
- */
-Fibula.TileMap.PROJECTION_ISOMETRIC = "isometric";
-
-/**
- * Renders the tile map by looping through all layers on a given html canvas element.
- * 
- * @param {HTMLCanvasElement} canvas The canvas element to draw the tile map on.
- */
-Fibula.TileMap.prototype.render = function(canvas)
-{
-    switch(this.projection) {
-        case Fibula.TileMap.PROJECTION_ORTHOGONAL:
-            this.renderer = new Fibula.OrthogonalRenderer(canvas);
-            break;
-        case Fibula.TileMap.PROJECTION_ISOMETRIC:
-            this.renderer = new Fibula.IsometricRenderer(canvas);
-            break;
-    }
-    
-    this.renderer.render(this);
+Fibula.TileMap.prototype = {
+    constructor: Fibula.TileMap,
+    tileWidth: false,
+    tileHeight: false,
+    layers: false,
+    key: 'no_key'
 };
-
-/**
- * Loads a json file definition of a tile map.
- * @param {string} path The path of the json file.
- */
-Fibula.TileMap.prototype.loadFromJson = function(path)
-{
-    // @todo call parser
-};
-
-/**
- * Adds a tile map layer to the tile map and returns the tile map.
- * 
- * @param {Fibula.TileMapLayer} layer The tile map layer to add.
- */
-Fibula.TileMap.prototype.addLayer = function(layer)
-{
-    this.layers.push(layer);
-    return this;
-};
-
-Fibula.TileMap.prototype.constructor = Fibula.TileMap;

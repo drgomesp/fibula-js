@@ -12,29 +12,40 @@
  *
  * @class Fibula.TileMapLayer
  * @constructor
- * @param {string} name The name of the layer.
- * @param {Fibula.TileMap} tileMap The tile map where this layer belongs to.
+ * @param {Object} settings The settings object.
  */
-Fibula.TileMapLayer = function(name, tileMap)
+Fibula.TileMapLayer = function(settings)
 {
+    /**
+     * The settings object.
+     * @type {Object}
+     */
+    settings = settings || {};
+
     /**
      * The name of the layer.
      * @type {string}
      */
-    this.name = name;
+    this.name = settings.name || this.name;
+
+    /**
+     * The opacity of the layer (1 == 100%).
+     * @type {number}
+     */
+    this.opacity = settings.opacity || this.opacity;
+
+    /**
+     * Weather the layer is visible or not.
+     * @type {boolean}
+     */
+    this.visible = typeof settings.visible !== "undefined" ? settings.visible : this.visible; 
+
+    /**
+     * The tile set to be used with this layer.
+     * @type {Fibula.TileSet}
+     */
+    this.tileSet = settings.tileSet || this.tileSet;
     
-    /**
-     * The tile map where this layer belongs to – returned after adding this layer to the map.
-     * @type {Fibula.TileMap}
-     */
-    this.tileMap = tileMap ? tileMap.addLayer(this) : null;
-
-    /**
-     * The data array containing the keys for the tile set image.
-     * @type {Array}
-     */
-    this.data = [];
-
     /**
      * The array of tiles of this layer.
      * @type {Array}
@@ -42,25 +53,51 @@ Fibula.TileMapLayer = function(name, tileMap)
     this.tiles = [];
 
     /**
-     * The opacity of the layer (1 == 100%).
+     * The width of the layer.
      * @type {number}
      */
-    this.opacity = 1;
+    this.width;
 
     /**
-     * Weather the layer is visible or not.
-     * @type {boolean}
+     * The height of the layer.
+     * @type {number}
      */
-    this.visible = true;
+    this.height;
+
+    if (settings.data) {
+        this.fillTiles(settings.data);
+    }
+};
+
+Fibula.TileMapLayer.prototype = {
+    name: 'no_name',
+    tiles: false,
+    opacity: 1,
+    visible: true,
+    tileSet: null,
+    width: false,
+    height: false
 };
 
 /**
- * Adds a tile to the layer.
- * @param {Fibula.Tile} tile The tile to add.
+ * Fills the layer with tiles using the data information of the tile set.
+ * 
+ * @param {Array} data The tile set data array for the layer.
  */
-Fibula.TileMapLayer.prototype.addTile = function(tile)
+Fibula.TileMapLayer.prototype.fillTiles = function(data)
 {
-    this.tiles.push(tile);
+    this.tiles = [];
+    this.height = this.width = data.length;
+    
+    for(var x = 0; x < this.width; x++) {
+        if (typeof this.tiles[x] === "undefined") {
+            this.tiles[x] = [];
+        }
+        
+        for(var y = 0; y < this.height; y++) {
+            this.tiles[x][y] = new Fibula.Tile(x, y, data[y][x]);
+        }
+    }
 };
 
 Fibula.TileMapLayer.prototype.constructor = Fibula.TileMapLayer;
