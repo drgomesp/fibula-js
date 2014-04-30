@@ -33,8 +33,10 @@ Navigation
 
 Getting Started
 -----
+[Go back to top](https://github.com/drgomesp/Fibula#navigation)
 
 ### The simplest way
+[Go back to top](https://github.com/drgomesp/Fibula#navigation)
 
 The simplest way to draw a tile map is to manually create the tile set, the layers 
 and the actual map itself. Those are the basic components that make a tile map at the end.
@@ -43,6 +45,7 @@ and the actual map itself. Those are the basic components that make a tile map a
 > issue by using asset management libraries, such as [PxLoader](https://github.com/thinkpixellab/PxLoader).
 
 #### Orthogonal tile map
+[Go back to top](https://github.com/drgomesp/Fibula#navigation)
 
 > **Notice:** This example was built using this [tutorial](http://blog.sklambert.com/create-a-canvas-tileset-background/). 
 > Thanks to [Steven Lambert](https://github.com/straker) for writing such an amazing
@@ -277,6 +280,7 @@ Here, we're using a camera with 300x300 dimensions and we start rendering the ma
 ![orthogonal-tilemap-two-layers-camera](http://s13.postimg.org/9gdse24tz/Captura_de_Tela_2014_04_29_s_20_45_13.png)
 
 #### Isometric tile map
+[Go back to top](https://github.com/drgomesp/Fibula#navigation)
 
 If you want to create an isometric tile map, the code for it is almost the same as
 for the orthogonal. Suppose you have the following isometric tile set:
