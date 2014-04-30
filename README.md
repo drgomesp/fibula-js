@@ -23,6 +23,14 @@ Dependencies
 
 - [Pixi.js](https://github.com/GoodBoyDigital/pixi.js) – 2d WebGL renderer with canvas fallback
 
+Navigation
+-----
+
+- [Getting Started](https://github.com/drgomesp/Fibula#getting-started)
+    - [The simplest way](https://github.com/drgomesp/Fibula#the-simplest-way)
+        - [Orthogonal tile map](https://github.com/drgomesp/Fibula#orthogonal-tile-map)
+        - [Isometric tile map](https://github.com/drgomesp/Fibula#isometric-tile-map)
+
 Getting Started
 -----
 
