@@ -92,10 +92,8 @@ Fibula.TileMapLayer.prototype.fillTiles = function(data)
     
     var pos;
     
-    for(var x = 0; x < data.length; x++) {
-        if (typeof this.tiles[x] === "undefined") {
-            this.tiles[x] = [];
-        }
+    for(var x = 0; x < this.width; x++) {
+        this.tiles[x] = [];
         
         for(var y = 0; y < this.height; y++) {
             pos = data[y][x] != null ? data[y][x] : NaN;
