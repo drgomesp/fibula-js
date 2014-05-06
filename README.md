@@ -1,12 +1,16 @@
-Fibula
+Fibula 1.0.0
 ======
 A tile-based HTML5 Canvas & WebGL engine with support for orthogonal and axonometric – isometric, dimetric and trimetric – projections.
- 
-By [Daniel Ribeiro](http://github.com/drgomesp).
+
+
+Version: 1.0.0 – Released 6th May 2014
+
+By **Daniel Ribeiro**, [@drgomesp](http://twitter.com/drgomesp).
 
 Features
 -----
 
+- WebGL rendering
 - Orthogonal tile maps
 - Isometric tile maps
 - Tile map layers with visibility and opacity
