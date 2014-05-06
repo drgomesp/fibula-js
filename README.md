@@ -287,67 +287,81 @@ for the orthogonal. Suppose you have the following isometric tile set:
 
 ![isometric-tileset](http://s27.postimg.org/6c9sa3s0j/isometric_grass_and_water.png)
 
-The first thing we need to do is create the `TileSet` object, as we did on the previous example:
+The first thing we need to do is create the first layer that will go into the tile map:
 
 ```javascript
 var loader = new PxLoader(),
-    tileSetImage = loader.addImage("http://s27.postimg.org/6c9sa3s0j/isometric_grass_and_water.png");
-   
+    tileSetImage = loader.addImage('assets/isometric.png');
+
 loader.addCompletionListener(function() {
-    var tileSet = new Fibula.TileSet(tileSetImage, 64, 64);
-});
-```
-
-In this example, the tile set has tiles of 64x64 dimensions.
-
-The next step is to create the tile map and the first layer (and we're going to create a much smaller
-map in order for the example to be cleaner):
-
-```javascript
-loader.addCompletionListener(function() {
-    var tileSet = new Fibula.TileSet(tileSetImage, 64, 64),
-        tileMap = new Fibula.TileMap("isometric-map", tileSet, 320, 160, Fibula.TileMap.PROJECTION_ISOMETRIC),
-        layer1 = new Fibula.TileMapLayer("Tile Layer 1", tileMap);
-        
-    layer1.data = [
+    var tileSet = new Fibula.TileSet(tileSetImage),
+        layer1data = [
         [3, 3, 3, 3, 3],
         [3, 3, 3, 3, 3],
         [3, 3, 3, 3, 3],
         [3, 3, 3, 3, 3],
         [3, 3, 3, 3, 0]
     ];
+
+    var layer1 = new Fibula.TileMapLayer({
+        name: 'layer 1',
+        tileSet: tileSet,
+        data: layer1data,
+        visible: true,
+        opacity: 1
+    });
+});
+```
+
+Now, we need to create our tile map object and the renderer:
+
+```javascript
+var loader = new PxLoader(),
+    tileSetImage = loader.addImage('assets/isometric.png');
+
+loader.addCompletionListener(function() {
+    var tileSet = new Fibula.TileSet(tileSetImage),
+        layer1data = [
+        [3, 3, 3, 3, 3],
+        [3, 3, 3, 3, 3],
+        [3, 3, 3, 3, 3],
+        [3, 3, 3, 3, 3],
+        [3, 3, 3, 3, 0]
+    ];
+
+    var layer1 = new Fibula.TileMapLayer({
+        name: 'layer 1',
+        tileSet: tileSet,
+        data: layer1data,
+        visible: true,
+        opacity: 1
+    });
+    
+    var tileMap = new Fibula.TileMap({
+        tileWidth: 64,
+        tileHeight: 32,
+        layers: [layer1]
+    });
+
+    var renderer = new Fibula.IsometricRenderer({
+        tileMap: tileMap
+    });
 });
 ```
 
 Now let's render our tile map:
 
 ```javascript
-loader.addCompletionListener(function() {
-    var tileSet = new Fibula.TileSet(tileSetImage, 64, 64),
-        tileMap = new Fibula.TileMap("isometric-map", tileSet, 320, 160, Fibula.TileMap.PROJECTION_ISOMETRIC),
-        layer1 = new Fibula.TileMapLayer("Tile Layer 1", tileMap);
-        
-    layer1.data = [
-        [3, 3, 3, 3, 3],
-        [3, 3, 3, 3, 3],
-        [3, 3, 3, 3, 3],
-        [3, 3, 3, 3, 3],
-        [3, 3, 3, 3, 0]
-    ];    
-    
-    var canvas = document.getElementById("main");
-    tileMap.render(canvas);
+renderer.render({
+    x: 0,
+    y: 0,
+    width: 320,
+    height: 320
 });
 ```
 
 > Notice here the usage of a 64x32 tile size for the map, which differs from the size
-> of the tiles on the tile set in this case.
-
-Now, you start the PxLoader loader:
-
-```javascript
-loader.start();
-```
+> of the tiles on the tile set in this case – 64x64 on tile set.
 
 The result should look like this:
 
@@ -356,14 +370,21 @@ The result should look like this:
 Now, let's add a new layer and make this map a little bit more interesting:
 
 ```javascript
-var layer2 = new Fibula.TileMapLayer("Tile Layer 2", tileMap);
-layer2.data = [
-    [],
-    [],
-    [],
-    [4, 19, 19, 19, 19],
-    [16, 23, 23, 23, 23]
+ var layer2data = [
+    [null, null, null, 4, 16],
+    [null, null, null, 19, 23],
+    [null, null, null, 19, 23],
+    [null, null, null, 19, 23],
+    [null, null, null, 19, 23]
 ];
+
+var layer2 = new Fibula.TileMapLayer({
+    name: 'layer 2',
+    tileSet: tileSet,
+    data: layer2data,
+    visible: true,
+    opacity: 1
+});
 ```
 
 After the render, the result should look something like this:
